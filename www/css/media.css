@@ -12,12 +12,12 @@
 		-webkit-box-shadow: 5px 5px 5px #888;
 		box-shadow: 5px 5px 5px #888;*/
 		margin:0; 
-		background: #FFF;
+		background: #dedede !important;
 	}
 	
 	.ui-page {
 		margin:0;
-		background-color:#dedede;
+		background:#dedede;
 		
 	}
 	
@@ -26,15 +26,23 @@
 		margin: 0;
 		
 	}
-	.ui-grid-a>.ui-block-b {
+	.ui-grid-a>.ui-block-b.page-wrapper {
 		width:70% ;	
 		background-color:#dedede ;
 	}
 	
 	
-	.ui-grid-a>.ui-block-a {
+	.ui-grid-a>.ui-block-a.page-wrapper {
 		width:30% ;	
 		background-color:#dedede ;
+	}
+	
+	.ui-content {
+		margin-top:5px;
+	}
+	
+	#main-navigation li:first-child a, #main-navigation li:last-child a {
+		border-top:none;
 	}
 	
 	
@@ -66,15 +74,14 @@
 		border-right:0px !important;
 		border-color:#D0DAE3; 
 		border-style:solid;
+	    display:block;
 	}
 	
 	#nav-panel.ui-panel-closed {
 		width: 30%;
 		visibility: visible;
-		
 		margin-top: 37px;
 		padding: 05px 0 0 0em;
-	
 		/*height:320px;*/
 	}
 	
@@ -90,15 +97,14 @@
 		border-bottom-width:0px;
 	}
 
-	/*NICHT offen auf den Navigationsseiten */
+	/*NICHT offen auf den Navigationsseiten
 	
-	/*body#panel-off #nav-panel.ui-panel-closed {
-	width:0%;
-	visibility:hidden;}*/
+	.indexpage #nav-panel.ui-panel-closed .ui-panel-inner {
+	
+	display:none;
+	}  */
 	
 	/*list-items panel */
-	
-	
 
 	#nav-panel .ui-btn {
 		font-size: 16px;
@@ -145,19 +151,19 @@
 
 	
 	#nav-panel .ui-listview.ui-group-theme-b  li.home a {
-		background-image: url(../img/up/news.png);
+		background-image: url(../img/up/home.png);
 		background-repeat: no-repeat;
 		background-position: bottom left;
 	}
 	
 	#nav-panel .ui-listview.ui-group-theme-b  li.options a {
-		background-image: url(../img/up/news.png);
+		background-image: url(../img/up/options.png);
 		background-repeat: no-repeat;
 		background-position: bottom left;
 	}
 
 	#nav-panel .ui-listview.ui-group-theme-b  li.news a {
-		background-image: url(../img/up/news.png);
+		background-image: url(../img/up/news2.png);
 		background-repeat: no-repeat;
 		background-position: bottom left;
 	}
@@ -190,6 +196,28 @@
 		background-image: url(../img/up/search.png);
 		background-repeat: no-repeat;
 		background-position: bottom left;
+	}
+	
+	/* Bus und Bahn */
+	
+	.buttons_pt div.ui-slider-switch {
+	padding-bottom: 5%;
+		padding-top: 5%;
+		
+	}
+	
+	.buttons_pt .ui-input-text {
+		padding:10% 0 !important;
+	}
+	
+	.ui-body-c .buttons_pt.ui-navbar.submit-route .ui-btn{
+		padding-bottom: 10% !important;
+		padding-top: 5% !important;
+	}
+	
+	.ui-body-c .buttons_pt.ui-navbar .ui-btn{
+		padding-bottom: 10%;
+		padding-top: 10%;
 	}
 }
 
@@ -208,12 +236,12 @@
 		-webkit-box-shadow: 5px 5px 5px #888;
 		box-shadow: 5px 5px 5px #888;*/
 		margin:0; 
-		background: #FFF;
+		background: #dedede !important;
 	}
 	
 	.ui-page {
 		margin:0;
-		background-color:#dedede;
+		background:#dedede;
 		
 	}
 	
@@ -222,16 +250,25 @@
 		margin: 0;
 		
 	}
-	.ui-grid-a>.ui-block-b {
+	.ui-grid-a>.ui-block-b.page-wrapper {
 		width:70% ;	
 		background-color:#dedede ;
 	}
 	
 	
-	.ui-grid-a>.ui-block-a {
+	.ui-grid-a>.ui-block-a.page-wrapper {
 		width:30% ;	
 		background-color:#dedede ;
 	}
+	
+	.ui-content {
+		margin-top:5px;
+	}
+	
+	#main-navigation li:first-child a, #main-navigation li:last-child a {
+		border-top:none;
+	}
+	
 	
 	
 	/*panel immer offen */
@@ -267,10 +304,8 @@
 	#nav-panel.ui-panel-closed {
 		width: 30%;
 		visibility: visible;
-		
 		margin-top: 37px;
-		padding: 05px0 0 0em;
-	
+		padding: 05px 0 0 0em;
 		/*height:320px;*/
 	}
 	
@@ -293,8 +328,6 @@
 	visibility:hidden;}*/
 	
 	/*list-items panel */
-	
-	
 
 	#nav-panel .ui-btn {
 		font-size: 16px;
@@ -341,19 +374,19 @@
 
 	
 	#nav-panel .ui-listview.ui-group-theme-b  li.home a {
-		background-image: url(../img/up/news.png);
+		background-image: url(../img/up/home.png);
 		background-repeat: no-repeat;
 		background-position: bottom left;
 	}
 	
 	#nav-panel .ui-listview.ui-group-theme-b  li.options a {
-		background-image: url(../img/up/news.png);
+		background-image: url(../img/up/options.png);
 		background-repeat: no-repeat;
 		background-position: bottom left;
 	}
 
 	#nav-panel .ui-listview.ui-group-theme-b  li.news a {
-		background-image: url(../img/up/news.png);
+		background-image: url(../img/up/news2.png);
 		background-repeat: no-repeat;
 		background-position: bottom left;
 	}
@@ -386,6 +419,28 @@
 		background-image: url(../img/up/search.png);
 		background-repeat: no-repeat;
 		background-position: bottom left;
+	}
+	
+	/* Bus und Bahn */
+	
+	.buttons_pt div.ui-slider-switch {
+		padding-bottom: 5%;
+		padding-top: 5%;
+		
+	}
+	
+	.buttons_pt .ui-input-text {
+		padding:10% 0 !important;
+	}
+	
+	.ui-body-c .buttons_pt.ui-navbar.submit-route .ui-btn{
+		padding-bottom: 10% !important;
+		padding-top: 5% !important;
+	}
+	
+	.ui-body-c .buttons_pt.ui-navbar .ui-btn{
+		padding-bottom: 10%;
+		padding-top: 10%;
 	}
 }
 
@@ -403,12 +458,12 @@
 		-webkit-box-shadow: 5px 5px 5px #888;
 		box-shadow: 5px 5px 5px #888;*/
 		margin:0; 
-		background: #FFF;
+		background: #dedede !important;
 	}
 	
 	.ui-page {
 		margin:0;
-		background-color:#dedede;
+		background:#dedede;
 		
 	}
 	
@@ -417,17 +472,24 @@
 		margin: 0;
 		
 	}
-	.ui-grid-a>.ui-block-b {
+	.ui-grid-a>.ui-block-b.page-wrapper {
 		width:70% ;	
 		background-color:#dedede ;
 	}
 	
 	
-	.ui-grid-a>.ui-block-a {
+	.ui-grid-a>.ui-block-a.page-wrapper {
 		width:30% ;	
 		background-color:#dedede ;
 	}
 	
+	.ui-content {
+		margin-top:5px;
+	}
+	
+	#main-navigation li:first-child a, #main-navigation li:last-child a {
+		border-top:none;
+	}
 	
 	/*panel immer offen */
 	
@@ -462,10 +524,8 @@
 	#nav-panel.ui-panel-closed {
 		width: 30%;
 		visibility: visible;
-		
 		margin-top: 37px;
-		padding: 05px0 0 0em;
-	
+		padding: 05px 0 0 0em;
 		/*height:320px;*/
 	}
 	
@@ -488,8 +548,6 @@
 	visibility:hidden;}*/
 	
 	/*list-items panel */
-	
-	
 
 	#nav-panel .ui-btn {
 		font-size: 16px;
@@ -536,19 +594,19 @@
 
 	
 	#nav-panel .ui-listview.ui-group-theme-b  li.home a {
-		background-image: url(../img/up/news.png);
+		background-image: url(../img/up/home.png);
 		background-repeat: no-repeat;
 		background-position: bottom left;
 	}
 	
 	#nav-panel .ui-listview.ui-group-theme-b  li.options a {
-		background-image: url(../img/up/news.png);
+		background-image: url(../img/up/options.png);
 		background-repeat: no-repeat;
 		background-position: bottom left;
 	}
 
 	#nav-panel .ui-listview.ui-group-theme-b  li.news a {
-		background-image: url(../img/up/news.png);
+		background-image: url(../img/up/news2.png);
 		background-repeat: no-repeat;
 		background-position: bottom left;
 	}
@@ -581,5 +639,27 @@
 		background-image: url(../img/up/search.png);
 		background-repeat: no-repeat;
 		background-position: bottom left;
+	}
+	
+	/* Bus und Bahn */
+	
+	.buttons_pt div.ui-slider-switch {
+	padding-bottom: 5%;
+		padding-top: 5%;
+		
+	}
+	
+	.buttons_pt .ui-input-text {
+		padding:10% 0 !important;
+	}
+	
+	.ui-body-c .buttons_pt.ui-navbar.submit-route .ui-btn{
+		padding-bottom: 10% !important;
+		padding-top: 5% !important;
+	}	
+		
+	.ui-body-c .buttons_pt.ui-navbar .ui-btn{
+		padding-bottom: 10%;
+		padding-top: 10%;
 	}
 }
