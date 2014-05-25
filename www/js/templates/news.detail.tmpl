@@ -1,0 +1,24 @@
+<!-- Start Header -->
+<div data-role="header" data-position="fixed" data-tap-toggle="false">
+  <a href="#news" data-role="button" data-icon="false"
+    data-iconpos="left" data-inline="true" data-transition="slidefade"
+    data-direction="reverse" class="back">Back</a>
+  <!--        <a href="#homePanel" data-icon="home" class="ui-btn-left">Menu</a>
+      <a href="index.html" data-icon="back" class="ui-btn-right">Zurück</a> -->
+  <h1>Neuigkeiten - <%= news.News.headline %></h1>
+</div>
+<!-- End Header -->
+<!-- Start Main - Navigation -->
+<div data-role="content" id="news-content">
+	<h2><%= news.News.headline %></h2>
+	<div class="news-text unchanged"><%= news.News.text %></div>
+	<br />
+	<br />
+	<div class="floatL clear">
+		<div>
+			<a onclick="app.openBrowser('<%=news.News.link%>')">Auf Website lesen</a>
+		</div>
+		<div>Veröffentlicht: <%= news.News.DateString %> Uhr</div>
+	</div>
+</div>
+<!-- End Main - Navigation -->

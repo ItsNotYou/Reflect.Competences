@@ -23,6 +23,7 @@ define([
 			"": "home",
 			"home": "home",
 			"news": "news",
+			"news/:action/:id": "news",
 			"events": "events",
 			"study": "study",
 			"campus": "campus",
@@ -53,9 +54,13 @@ define([
 			this.changePage(new HomePageView);
 		},
 
-		news: function(){
+		news: function(action, id){
 			console.log("Side -> News");
-			this.changePage(new NewsPageView);
+			console.log('Page', action);
+			console.log('Id', id);
+
+			this.changePage(new NewsPageView({action: action, aid: id}));
+
 		},
 
 		events: function(){
@@ -110,7 +115,7 @@ define([
 		},
 
 		changePage: function(page){
-
+			console.log(page);
 			if(!this.currentView){
 				$('#pagecontainer').children().first().remove();
 			}

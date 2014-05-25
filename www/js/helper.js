@@ -59,10 +59,10 @@ define(['jquery', 'underscore', 'backbone', 'app'], function($, _, Backbone, app
 	};
 
 	return {
-			rendertmpl: rendertmpl,
-			removeTabs: removeTabs,
-			addLoadingSpinner: addLoadingSpinner,
-			removeLoadingSpinner: removeLoadingSpinner,
-			getAuthHeader: getAuthHeader
-		};
+		rendertmpl: rendertmpl,
+		removeTabs: removeTabs,
+		addLoadingSpinner: addLoadingSpinner,
+		removeLoadingSpinner: removeLoadingSpinner,
+		getAuthHeader: getAuthHeader
+	};
 });
