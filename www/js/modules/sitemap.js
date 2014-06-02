@@ -1,52 +1,6 @@
-define(['jquery', 'underscore', 'backbone', 'helper', 'modules/campusmenu', 'modules/timeselection', 'modules/searchablemap', 'async!https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false'], function($, _, Backbone, helper, campusmenu, timeselection, searchablemap){
-	var settings =	{
-		url: {
-			griebnitzsee: {
-				campus: "griebnitzsee",
-				center: new google.maps.LatLng(52.39345677934452, 13.128039836883545)
-			},
-			neuespalais: {
-				campus: "neuespalais",
-				center: new google.maps.LatLng(52.400933, 13.011653)
-			},
-			golm: {
-				campus: "golm",
-				center: new google.maps.LatLng(52.408716, 12.976138)
-			}
-		},
-		options: {
-			terminals: { "icon": "img/up/puck-marker.png" },
-			canteens: { "icon": "img/up/mensa-marker.png" },
-			parking: {
-				"strokeColor": "#70c8dc",
-			    "strokeOpacity": 1,
-			    "strokeWeight": 0,
-			    "fillColor": "#70c8dc",
-			    "fillOpacity": 0.5
-			},
-			institutes: {
-				"strokeColor": "#e57967",
-			    "strokeOpacity": 1,
-			    "strokeWeight": 0,
-			    "fillColor": "#e57967",
-			    "fillOpacity": 0.5
-			},
-			associateinstitutes: {
-				"strokeColor": "#cf6da8",
-			    "strokeOpacity": 1,
-			    "strokeWeight": 0,
-			    "fillColor": "#cf6da8",
-			    "fillOpacity": 0.5
-			},
-			student: {
-				"strokeColor": "#897cc2",
-			    "strokeOpacity": 1,
-			    "strokeWeight": 0,
-			    "fillColor": "#897cc2",
-			    "fillOpacity": 0.5
-			}
-		}
-	};
+define(['jquery', 'underscore', 'backbone', 'utils', 'q', 'modules/campusmenu', 'modules/timeselection', 'modules/searchablemap'], function($, _, Backbone, utils, Q, campusmenu, timeselection, searchablemap){
+	
+	var settings = {};
 
 	var terminals = "terminals";
 	var institutes = "institutes";
@@ -61,17 +15,79 @@ define(['jquery', 'underscore', 'backbone', 'helper', 'modules/campusmenu', 'mod
 	var searchView = undefined;
 
 	$(document).on("pageinit", "#sitemap", function() {
-		settings.options.institutes.fillColor = $(".sitemap-institutes").css("background-color");
-		settings.options.parking.fillColor = $(".sitemap-parking").css("background-color");
-		settings.options.associateinstitutes.fillColor = $(".sitemap-associateinstitutes").css("background-color");
-		settings.options.student.fillColor = $(".sitemap-living").css("background-color");
+		$.getScript('https://www.google.com/jsapi', function(){
+			google.load('maps', '3', {other_params: 'sensor=false', callback: function(){
+				settings =	{
+					url: {
+						griebnitzsee: {
+							campus: "griebnitzsee",
+							center: new google.maps.LatLng(52.39345677934452, 13.128039836883545)
+						},
+						neuespalais: {
+							campus: "neuespalais",
+							center: new google.maps.LatLng(52.400933, 13.011653)
+						},
+						golm: {
+							campus: "golm",
+							center: new google.maps.LatLng(52.408716, 12.976138)
+						}
+					},
+					options: {
+						terminals: { "icon": "img/up/puck-marker.png" },
+						canteens: { "icon": "img/up/mensa-marker.png" },
+						parking: {
+							"strokeColor": "#70c8dc",
+						    "strokeOpacity": 1,
+						    "strokeWeight": 0,
+						    "fillColor": "#70c8dc",
+						    "fillOpacity": 0.5
+						},
+						institutes: {
+							"strokeColor": "#e57967",
+						    "strokeOpacity": 1,
+						    "strokeWeight": 0,
+						    "fillColor": "#e57967",
+						    "fillOpacity": 0.5
+						},
+						associateinstitutes: {
+							"strokeColor": "#cf6da8",
+						    "strokeOpacity": 1,
+						    "strokeWeight": 0,
+						    "fillColor": "#cf6da8",
+						    "fillOpacity": 0.5
+						},
+						student: {
+							"strokeColor": "#897cc2",
+						    "strokeOpacity": 1,
+						    "strokeWeight": 0,
+						    "fillColor": "#897cc2",
+						    "fillOpacity": 0.5
+						}
+					}
+				};
 
-		$('#Terminals:checkbox').click(checkUncheck(terminals));
-		$('#Institute:checkbox').click(checkUncheck(institutes));
-		$('#Mensen:checkbox').click(checkUncheck(canteens));
-		$('#Parking:checkbox').click(checkUncheck(parking));
-		$('#AnInstitute:checkbox').click(checkUncheck(associateinstitutes));
-		$('#Living:checkbox').click(checkUncheck(student));
+				settings.options.institutes.fillColor = $(".sitemap-institutes").css("background-color");
+				settings.options.parking.fillColor = $(".sitemap-parking").css("background-color");
+				settings.options.associateinstitutes.fillColor = $(".sitemap-associateinstitutes").css("background-color");
+				settings.options.student.fillColor = $(".sitemap-living").css("background-color");
+
+				$('#Terminals:checkbox').click(checkUncheck(terminals));
+				$('#Institute:checkbox').click(checkUncheck(institutes));
+				$('#Mensen:checkbox').click(checkUncheck(canteens));
+				$('#Parking:checkbox').click(checkUncheck(parking));
+				$('#AnInstitute:checkbox').click(checkUncheck(associateinstitutes));
+				$('#Living:checkbox').click(checkUncheck(student));
+
+			}});
+
+		}).fail(function(){
+			if(arguments[0].readyState==0){
+        		var errorPage = new utils.ErrorView({el: '#error-placeholder', msg: 'Es besteht keine Internetverbindung.', module:'sitemap'});
+    		}else{
+        		//script loaded but failed to parse
+	        	var errorPage = new utils.ErrorView({el: '#error-placeholder', msg: 'Es besteht keine Internetverbindung.', module:'sitemap'});
+    		}
+		});
 	});
 
 	function checkUncheck(category) {
@@ -123,9 +139,8 @@ define(['jquery', 'underscore', 'backbone', 'helper', 'modules/campusmenu', 'mod
 			.then(function() { return geo.loadAllOnce(); })
 			.then(drawCampus(uniqueDivId, campus))
 			.spread(setSearchValue(search))
-			.catch(function (e) {
-				console.log("Fehlschlag: " + e.stack);
-				alert("Fehlschlag: " + e.stack);
+			.catch(function (error) {
+				var errorPage = new utils.ErrorView({el: '#error-placeholder', msg: 'Es ist ein unerwarteter Fehler aufgetreten.', module:'sitemap', err: error});
 			});
 	}
 
@@ -345,7 +360,7 @@ define(['jquery', 'underscore', 'backbone', 'helper', 'modules/campusmenu', 'mod
 		},
 
 		failed: function(error) {
-			alert("Daten konnten nicht geladen werden");
+			var errorPage = new utils.ErrorView({el: '#error-placeholder', msg: 'Die Daten konnten nicht geladen werden.', module:'sitemap', err: error});
 		}
 	});
 
@@ -397,7 +412,7 @@ define(['jquery', 'underscore', 'backbone', 'helper', 'modules/campusmenu', 'mod
 		attributes: {"id": 'sitemap'},
 
 		initialize: function(){
-			this.template = helper.rendertmpl('sitemap');
+			this.template = utils.rendertmpl('sitemap');
 		},
 
 		render: function(){

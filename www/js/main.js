@@ -12,10 +12,11 @@ require.config({
     	'underscore': 'vendor/underscore-min',
         'underscore-string': 'vendor/underscore.string.min',
     	'backbone': 'vendor/backbone-min',
-        'async' : 'lib/async',
         'geojson': 'lib/GeoJSON',
         'date': 'lib/date',
-        'q': 'lib/q'
+        'q': 'vendor/q',
+        'moment': 'vendor/moment.min',
+        'utils': 'lib/utils'
     },
     shim: {
         // use namespace Backbone
@@ -47,6 +48,16 @@ require.config({
     }
 
 });
+
+requirejs.onError = function(error){
+	var failedId = error.requireModules && error.requireModules[0];
+
+	if(error.requireType === 'timeout'){
+		console.log('Timeout of RequireJS-Module:'+error.requireModules);
+	}else{
+		throw error;
+	}
+};
 
 require(['jquery', 'app', 'jquerymobile', 'jquerymobile-config'], function($, App){
     $(function(){

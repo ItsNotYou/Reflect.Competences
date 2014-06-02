@@ -1,4 +1,4 @@
-define(['jquery', 'underscore', 'backbone', 'helper', 'geojson'], function($, _, Backbone, helper, GeoJSON){
+define(['jquery', 'underscore', 'backbone', 'utils', 'geojson'], function($, _, Backbone, utils, GeoJSON){
 
 	var CategoryMarker = function (marker, map, category, categoryStore) {
 
@@ -82,6 +82,7 @@ define(['jquery', 'underscore', 'backbone', 'helper', 'geojson'], function($, _,
 					<div class='ui-controlgroup ui-controlgroup-vertical ui-corner-all' data-role='controlgroup' data-filter='true' data-input='#filterable-locations' data-filter-reveal='true' data-enhanced='true'> \
 						<div class='ui-controlgroup-controls'></div> \
 					</div> \
+					<div id='error-placeholder'></div> \
 					<!-- map loads here... --> \
 					<div id='map-canvas' class='gmap3' style='height: 400px;'></div> \
 				</div>");
@@ -148,7 +149,7 @@ define(['jquery', 'underscore', 'backbone', 'helper', 'geojson'], function($, _,
 		},
 
 		_insertSearchables: function(searchables) {
-			var createSearchables = helper.rendertmpl("sitemap_detail");
+			var createSearchables = utils.rendertmpl("sitemap_detail");
 			var host = $("#filterable-locations");
 
 			// Add items to search list
