@@ -96,13 +96,19 @@ define(['jquery', 'underscore', 'backbone', 'app'], function($, _, Backbone, app
 			return this;
 		}
 	});
+	
+	capitalize = function(string)
+	{
+		return string.charAt(0).toUpperCase() + string.slice(1);
+	}
 
 	return {
-			rendertmpl: rendertmpl,
-			removeTabs: removeTabs,
-			addLoadingSpinner: addLoadingSpinner,
-			removeLoadingSpinner: removeLoadingSpinner,
-			getAuthHeader: getAuthHeader,
-			ErrorView: ErrorView
-		};
+		rendertmpl: rendertmpl,
+		capitalize: capitalize,
+		removeTabs: removeTabs,
+		addLoadingSpinner: addLoadingSpinner,
+		removeLoadingSpinner: removeLoadingSpinner,
+		getAuthHeader: getAuthHeader,
+		ErrorView: ErrorView
+	};
 });

@@ -1,10 +1,10 @@
 define(['jquery', 'underscore', 'backbone', 'utils'], function($, _, Backbone, utils){
 
-	var HomePageView = Backbone.View.extend({
+	app.views.MainPage = Backbone.View.extend({
 		attributes: {"id": 'home'},
 
 		initialize: function(){
-			this.template = utils.rendertmpl('home');
+			this.template = utils.rendertmpl('main.menu');
 		},
 
 		render: function(){
@@ -14,5 +14,4 @@ define(['jquery', 'underscore', 'backbone', 'utils'], function($, _, Backbone, u
 		}
 	});
 
-	return HomePageView;
 });

@@ -1,11 +1,14 @@
 /*
  *	Router
  */
+
 define([
 	'jquery',
 	'underscore',
 	'backbone',
 	'modules/home',
+	'modules/news',
+	'modules/events',
 	'modules/study',
 	'modules/emergency',
 	'modules/campus',
@@ -16,7 +19,7 @@ define([
 	'modules/transport2',
 	'modules/mensa',
 	'modules/library'
-	], function($, _, Backbone, HomePageView, StudyPageView, EmergencyPageView,	CampusPageView, SitemapPageView, RoomPageView, OpeningPageView, TransportPageView, Transport2PageView, MensaPageView, LibraryPageView){
+	], function($, _, Backbone, HomePageView, NewsPageView, EventsPageView, StudyPageView, EmergencyPageView, CampusPageView, SitemapPageView, RoomPageView, OpeningPageView, TransportPageView, Transport2PageView, MensaPageView, LibraryPageView){
 	var AppRouter = Backbone.Router.extend({
 		routes:{
 			// Routes for Index - Page

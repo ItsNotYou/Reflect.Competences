@@ -24,7 +24,7 @@
 			img = e.pic_square ? '<img class="event-thumb" src="'+ e.pic_square + '" />' : '';
 			marked = '<br /><span class="relative floatL vorgemerkt">Vorgemerkt</span>';
 			%>
-				<li<%=extra%> class="<%=klasse%>" id="<%= e.id%>"><a href="#events/view/<%= e.id %>">
+				<li<%=extra%> class="<%=klasse%>" id="<%= e.id%>"><a href="events/view/<%= e.id %>">
 					<%= img %>
 					<div class="event-caption">
 						<span class="event-title"><%=e.name %></span>

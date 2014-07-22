@@ -1,3 +1,4 @@
+alert('alt');
 requirejs.config({
     //Standardmäßig alles aus dem lib-Pfad laden
     baseUrl: 'lib',

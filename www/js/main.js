@@ -12,17 +12,24 @@ require.config({
     	'underscore': 'vendor/underscore-min',
         'underscore-string': 'vendor/underscore.string.min',
     	'backbone': 'vendor/backbone-min',
+		'backboneMVC': 'vendor/backbone-mvc',
         'geojson': 'lib/GeoJSON',
         'date': 'lib/date',
         'q': 'vendor/q',
         'moment': 'vendor/moment.min',
-        'utils': 'lib/utils'
+        'utils': 'lib/utils',
+		'ls-store': 'lib/ls-store'
     },
     shim: {
         // use namespace Backbone
     	'backbone': {
     		deps: ['jquery', 'underscore'],
     		exports: 'Backbone'
+    	},
+		 // use namespace Backbone
+    	'backboneMVC': {
+    		deps: ['backbone'],
+    		exports: 'BackboneMVC'
     	},
         // use namespace _
     	'underscore': {

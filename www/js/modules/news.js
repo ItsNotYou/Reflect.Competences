@@ -1,18 +1,21 @@
-define(['jquery', 'underscore', 'backbone', 'helper', 'date'], function($, _, Backbone, helper, date){
-
+define(['jquery', 'underscore', 'backbone', 'utils', 'date'], function($, _, Backbone, helper, date){
+	var classes = {};
+	
 	/*
 	 *	Backbone Model - NewsEntry
 	 */
-	var NewsEntry = Backbone.Model.extend({
+	app.models.NewsEntry = Backbone.Model.extend({
 		url: 'http://headkino.de/potsdamevents/json/news/view/',
 
 		initialize: function(){
-			this.url=this.url+this.id;
+			this.url = this.url+this.id;
 		},
 
 		parse: function(response){
-			console.log(response);
-			return response.vars;
+			//console.log(response);
+			if(response.vars) 
+				response = response.vars;
+			return response;
 		}
 	});
 
@@ -28,83 +31,74 @@ define(['jquery', 'underscore', 'backbone', 'helper', 'date'], function($, _, Ba
 	/*
 	 *	Backbone Model - News
 	 */
-	var News = Backbone.Collection.extend({
-		model: NewsListItem,
-		url: 'js/json/news.json',
+	app.models.News = Backbone.Collection.extend({
+		model: app.models.NewsEntry,
+		url: 'http://headkino.de/potsdamevents/json/news/',
 
 		initialize: function(){
 		},
 
 		parse: function(response){
-			console.log(response);
-			return response.vars.news;
+			if(response.vars) 
+				response = response.vars;
+			this.response = response;
+			return response.news;
 		},
 	});
 
 	var NewsSource = Backbone.Collection.extend({
-		model: News
+		model: app.models.News
 	})
 
-	var NewsEntryView = Backbone.View.extend({
+	app.views.NewsView = Backbone.View.extend({
 		el: '#news-content',
-
-		initialize: function(){
-			this.template = helper.rendertmpl('news.detail');
-			_.bindAll(this, 'fetchSuccess', 'fetchError', 'render');
-			this.model.fetch({
-				success: this.fetchSuccess,
-				error: this.fetchError,
-				dataType: 'jsonp' });
-		},
-
-		fetchSuccess: function(){
-			this.render();
-		},
-
-		fetchError: function(){
-			throw new Error('Error loading NewsEntry-JSON file');
+		inCollection : 'news.index.news', //controller.action.variable
+		idInCollection : 'id', //name oder . getrennter Pfad, wo die id in der collection steht für ein objekt
+		initialize: function(p){
+			this.template = helper.rendertmpl('news.view');
+			_.bindAll(this, 'render');
+			console.log(p);
+			this.model = new app.models.NewsEntry(p);
 		},
 
 		render:function(){
-			$(this.el).html(this.template({news: this.model.toJSON()}));
+			var vars = $.extend(this.model.toJSON(), this.p);
+			if(!vars.news)
+				vars.news = vars;
+			$(this.el).html(this.template(vars));
 			$(this.el).trigger("create");
 			return this;
 		}
 	});
 
-	var NewsSourceView = Backbone.View.extend({
+	app.views.NewsSource = Backbone.View.extend({
 		el: '#news-content',
 
-		initialize: function(){
+		initialize: function(p){
 			this.template = helper.rendertmpl('news.source');
+
+			_.bindAll(this, 'render');
+			console.log(p);
+			this.collection = new app.models.News();
+			this.collection.fetch({
+				success: this.render,
+				dataType: 'json' });
 		},
 
 		render:function(){
 			console.log(this.collection);
-			$(this.el).html(this.template({newsSource: this.collection.toJSON()}));
+			$(this.el).html(this.template({news: this.collection.toJSON()}));
 			$(this.el).trigger("create");
 			return this;
 		}
 	});
 
-	var NewsView = Backbone.View.extend({
+	app.views.NewsIndex = Backbone.View.extend({
 		el: '#news-content',
 
 		initialize: function(){
 			this.template = helper.rendertmpl('news.index');
-			_.bindAll(this, 'fetchSuccess', 'fetchError', 'render');
-			this.collection.fetch({
-				success: this.fetchSuccess,
-				error: this.fetchError
-			});
-		},
-
-		fetchSuccess: function(){
-			this.render();
-		},
-
-		fetchError: function(){
-			throw new Error('Error loading News-JSON file');
+			this.collection = new app.models.News();
 		},
 
 		render: function(){
@@ -115,7 +109,7 @@ define(['jquery', 'underscore', 'backbone', 'helper', 'date'], function($, _, Ba
 
 	});
 
-	var NewsPageView = Backbone.View.extend({
+	app.views.NewsPage = Backbone.View.extend({
 		attributes: {"id": "news"},
 
 		initialize: function(options){
@@ -129,7 +123,7 @@ define(['jquery', 'underscore', 'backbone', 'helper', 'date'], function($, _, Ba
 			console.log(this.options.action);
 			console.log(this.options.aid);
 
-			if (!this.options.action){
+			/*if (!this.options.action){
 				var news = new News();
 				var newsView = new NewsView({collection: news, el: $("#news-content", this.el)});
 			} else {
@@ -138,7 +132,7 @@ define(['jquery', 'underscore', 'backbone', 'helper', 'date'], function($, _, Ba
 					var newsEntry = new NewsEntry({id: this.options.aid});
 					var newsEntryView = new NewsEntryView({model: newsEntry, el: $("#news-content", this.el)});
 				}
-			}
+			}*/
 
 			$(this.el).trigger("create");
 			return this;
@@ -150,10 +144,7 @@ define(['jquery', 'underscore', 'backbone', 'helper', 'date'], function($, _, Ba
 		}
 	});
 
-	return NewsPageView;
-
-
-
+	return classes; //NewsPageView;
 });
 
 

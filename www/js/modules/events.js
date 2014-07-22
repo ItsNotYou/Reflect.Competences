@@ -1,122 +1,109 @@
-define(['jquery', 'underscore', 'backbone', 'helper', 'date'], function($, _, Backbone, helper, date){
+define(['jquery', 'underscore', 'backbone', 'utils', 'date'], function($, _, Backbone, utils, date){
 
 	/*
 	 *
 	 */
-	var Event = Backbone.Model.extend({
+	app.models.Event = Backbone.Model.extend({
+		url: 'http://headkino.de/potsdamevents/json/events/view/',
+		initialize: function(){
+			this.url = this.url + this.id;
+		},
+		parse: function(response){
+			if(response.vars) 
+				response = response.vars;
+			return response;
+		}
 	});
 
-	var Events = Backbone.Collection.extend({
-		model: Event,
-		url: 'js/json/events.json',
+	app.models.Events = Backbone.Collection.extend({
+		model: app.models.Event,
+		//url: 'js/json/events.json',
+		url: 'http://headkino.de/potsdamevents/json/events/',
 
 		initialize: function(){
 		},
 
 		parse: function(response){
+			console.log(response);
+			this.response = response.vars;
 			return response.vars.events;
 		},
 
 	});
 
-	var EventView = Backbone.View.extend({
+	app.views.EventsView = Backbone.View.extend({
 		el: '#events',
-
-		initialize: function(){
-			this.template = helper.rendertmpl('events.detail');
+		inCollection : 'events.index.events', //controller.action.variable
+		idInCollection : 'id', //name oder . getrennter Pfad, wo die id in der collection steht für ein objekt
+		initialize: function(p){
+			this.template = utils.rendertmpl('events.view');
+			this.model = new app.models.Event(p);
+			
 		},
 
 		render:function(){
-			console.log(this.model);
-			$(this.el).html(this.template({event: this.model.toJSON()}));
+			var vars = $.extend(this.model.toJSON(), this.p);
+			if(!vars.event)
+				vars.event = vars;
+			$(this.el).html(this.template(vars));
 			$(this.el).trigger("create");
 			return this;
 		}
 
 	});
 
-	var EventsView = Backbone.View.extend({
+	app.views.EventsIndex = Backbone.View.extend({
 		el: '#events',
 
 		events: {
 			"click ul li" : 'renderEvent',
 		},
 
-		initialize: function(){
-			this.template = helper.rendertmpl('events.index');
-
-			_.bindAll(this, 'fetchSuccess', 'fetchError', 'render');
-			this.collection.fetch({
-				success: this.fetchSuccess,
-				error: this.fetchError
-			});
-
+		initialize: function(p){
+			this.template = utils.rendertmpl('events.index');
+			this.collection = new app.models.Events(p);
 			//this.going = LocalStore.get('going', {}); //Liste der vorgemerkten Events laden
 	   		//this.disabledLocations = LocalStore.get('disabledLocations', {});
-
-		},
-
-
-
-		fetchSuccess: function(){
-			this.render();
 		},
 
 		fetchError: function(){
-			throw new Error('Error loading Opening-JSON file');
+			throw new Error('Error loading JSON file'); 
 		},
 
 		render: function(){
-			$(this.el).html(this.template({events: this.collection.toJSON()}));
+			console.log($.extend({events: this.collection.toJSON()}, this.p));
+			$(this.el).html(this.template($.extend({events: this.collection.toJSON()}, this.p)));
 			$(this.el).trigger("create");
 			return this;
 		},
 
-		renderEvent: function(ev) {
-
+		/*renderEvent: function(ev) {
 	      ev.preventDefault();
-
 	      var eventId = $(ev.target).closest('li').attr('id')
-	      alert(eventId);
-
+			
 	      var event = this.collection.find(function(model) {
-
 	      	return model.get('Event').id == eventId;
 	      });
 
-	      var eventView = new EventView({model: event});
+	      var eventView = new app.views.EventsView({model: event});
 	      eventView.render();
-	      //var book = App.collections.searchResults.get(bookId);
-/*
-	      var BookDetailView = new App.view.BookDetailView({
-	          model: book
-	        });
-	      BookDetailView.render();
-*/
-	      //book.updateLocation();
-	    }
+	    }*/
 	});
 
-	var EventsPageView = Backbone.View.extend({
+	app.views.EventsPage = Backbone.View.extend({
 		attributes: {"id": "events"},
 
-		initialize: function(){
-			this.template = helper.rendertmpl('events');
+		initialize: function(vars){
+			this.template = utils.rendertmpl('events');
 		},
 
 		render: function(){
 			$(this.el).html(this.template({}));
-
-			var events = new Events();
-			console.log($("#events", this.el));
-			var eventsView = new EventsView({collection: events, el: $("#events", this.el)});
-
 			$(this.el).trigger("create");
 			return this;
 		}
 	});
 
-	return EventsPageView;
 });
 
 //going[id] marker in template missing
