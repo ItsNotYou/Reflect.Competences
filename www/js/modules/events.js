@@ -25,8 +25,10 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'date'], function($, _, Bac
 
 		parse: function(response){
 			console.log(response);
-			this.response = response.vars;
-			return response.vars.events;
+			if(response.vars)
+				response = response.vars;
+			this.response = response;
+			return response.events;
 		},
 
 	});
@@ -38,15 +40,14 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'date'], function($, _, Bac
 		initialize: function(p){
 			this.template = utils.rendertmpl('events.view');
 			this.model = new app.models.Event(p);
-			
 		},
 
 		render:function(){
 			var vars = $.extend(this.model.toJSON(), this.p);
 			if(!vars.event)
 				vars.event = vars;
-			$(this.el).html(this.template(vars));
-			$(this.el).trigger("create");
+			$(this.el, this.page).html(this.template(vars));
+			$(this.el, this.page).trigger("create");
 			return this;
 		}
 
@@ -54,10 +55,6 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'date'], function($, _, Bac
 
 	app.views.EventsIndex = Backbone.View.extend({
 		el: '#events',
-
-		events: {
-			"click ul li" : 'renderEvent',
-		},
 
 		initialize: function(p){
 			this.template = utils.rendertmpl('events.index');
@@ -75,23 +72,10 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'date'], function($, _, Bac
 			$(this.el).html(this.template($.extend({events: this.collection.toJSON()}, this.p)));
 			$(this.el).trigger("create");
 			return this;
-		},
-
-		/*renderEvent: function(ev) {
-	      ev.preventDefault();
-	      var eventId = $(ev.target).closest('li').attr('id')
-			
-	      var event = this.collection.find(function(model) {
-	      	return model.get('Event').id == eventId;
-	      });
-
-	      var eventView = new app.views.EventsView({model: event});
-	      eventView.render();
-	    }*/
+		}
 	});
 
 	app.views.EventsPage = Backbone.View.extend({
-		attributes: {"id": "events"},
 
 		initialize: function(vars){
 			this.template = utils.rendertmpl('events');

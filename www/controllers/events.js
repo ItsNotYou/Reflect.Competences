@@ -33,7 +33,7 @@ app.controllers.events = BackboneMVC.Controller.extend({
     index:function(filter){
 		var self = this;
 		this.filter = filter;
-		app.loadPage(this.name, 'index', {going:LocalStore.get('going', {})}).done(function(d, view){
+		app.loadPage(this.name, 'index', {going:this.going}).done(function(d, view){
 			//console.log(d);
 			if(!d) return;
 			self.events = d.events;

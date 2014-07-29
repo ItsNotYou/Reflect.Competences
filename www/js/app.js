@@ -20,7 +20,7 @@ define([
 		app = {
 			c: {}, //Controller-Objekte werden in diesem Array abgelegt
 			controllers: {}, //Controllerklassen
-			controllerList: ["controllers/main", "controllers/events", "controllers/news"], //In der app vorhandene Controller
+			controllerList: ["controllers/main", "controllers/events", "controllers/news", "controllers/campus", "controllers/opening"], //In der app vorhandene Controller
 			viewType:"text/x-underscore-template", //Templateenginekennung (Underscore)
 			requests : [], //Speichert die Rückgabe für jede URL (Cache)
 			cacheTimes: [], //Speichert für jede URL die letzte Zeit, wann diese vom Server geladen wurde
@@ -30,6 +30,7 @@ define([
 			views:{},
 			models:{},
 			data: {},
+			cache: {},
 			viewFileExt: 'js', //Dateiendung der View files
 			router : new AppRouter(), //Router zuweisen
 			/*
@@ -154,9 +155,13 @@ define([
 					$('#pagecontainer').children().first().remove();
 				}
 				
+				
 				var page = new app.views[utils.capitalize(c) + 'Page'];
+				console.log(page.el);
 				// prepare new view for DOM display
 				$(page.el).attr('data-role', 'page');
+				//$(page.el).attr(page.attributes);
+				
 				page.render();
 				console.log(utils.capitalize(c) + utils.capitalize(a));
 
@@ -164,7 +169,7 @@ define([
 			
 				$('body').css('overflow', 'hidden');
 				$('#nav-panel').css('display', 'none');
-				$('#pagecontainer').append($(page.el));
+				$('#pagecontainer').html($(page.el)); //Nur eine Seite im Container, damit keine ID-Konflikte auftreten
 				
 				var transition = $.mobile.defaultPageTransition;
 				// Erste Seite nicht sliden
@@ -173,16 +178,27 @@ define([
 					this.firstPage = false;
 				}
 				var content = false;
+				if(!app.data[c]) app.data[c] = {};
 				var success = function(s, d){
 					console.log(d);
 					if(content) {
 						if(content.beforeRender)
 							content.beforeRender();
-						if(s == 'set') {
+						if(s == 'set') { //Model aus collection geholt
 							if(content.model) {
 								content.model.set(d);
+								content.model.p = params;
 							}
-						} else {
+						} else if(s == 'cached') { //Daten aus dem Cache geholt
+							if(content.model) {
+								content.model.set(content.model.parse(d));
+								content.model.p = params;
+							}
+							if(content.collection) {
+								content.collection.set(content.collection.parse(d));
+								content.collection.p = params;
+							}
+						} else { //Daten vom Server geholt
 							if(content.collection) {
 								response = d = content.collection.toJSON();
 								content.collection.p = params;
@@ -198,15 +214,21 @@ define([
 						}
 						//var vars = d ? (d.vars ? $.extend(true, {}, d.vars) : $.extend(true, {}, d)) : {}; //Params für den View, wenn vorhanden, in das Datenobjekt integrieren
 						//$.extend(vars, params);
-						//app.cache['c.a'];
-						//console.log(d);
-						if(response) {
-							if(!app.data[c]) app.data[c] = {};
-							app.data[c][a] = response;
-							console.log(app.data);
+						//
+						console.log(response);
+						if(_.keys(response).length > 0) {
+							//alert('response');
+							app.data[c][a] = response; //Daten speichern
+							if(content.model)
+								app.cache[content.model.url] = response;
+							else if(content.collection) {
+								app.cache[content.collection.url] = response;
+							}
+							console.log(app.cache);
 						}
 						content.render();
 					}
+					console.log(page.el);
 					Q($.mobile.changePage($(page.el), {changeHash: false, transition: transition})).done(function(){
 						q.resolve(d, content);
 					});
@@ -214,15 +236,15 @@ define([
 				
 				if(app.views[utils.capitalize(c) + utils.capitalize(a)]) { //Wenn eine View-Klasse für Content vorhanden ist: ausführen
 					content = new app.views[utils.capitalize(c) + utils.capitalize(a)](params);
-					
-					if((content.model || content.collection) && content.inCollection) {
+					content.page = $(page.el);
+					if((content.model || content.collection) && content.inCollection) { //Element aus der geladener Colelction holen und nicht vom Server
 						var parts = content.inCollection.split('.');
 						try {
 							var list = eval('app.data.' + content.inCollection);
 						} catch(e) {
 						}
-						console.log(app.data);
-						console.log(list);
+						//console.log(app.data);
+						//console.log(list);
 						if(list) {
 							try {
 								var filteredList = _.filter(list, function(item){
@@ -239,6 +261,11 @@ define([
 						console.log(d);
 					}
 					if(content.collection) {
+						if(app.cache[content.collection.url]) {
+							console.log(app.cache[content.collection.url]);
+							//alert('cached');
+							success('cached', app.cache[content.collection.url]);
+						} else
 						content.collection.fetch({
 							success: success,
 							error: function(){
@@ -248,10 +275,13 @@ define([
 					} else
 					if(content.model) {
 						console.log(d);
-						if(_.keys(d).length > 0) {
+						if(_.keys(d).length > 0) { //Model bereits in Collection gefunden
 							success('set', d);
 						}
 						else
+						if(app.cache[content.model.url]) {
+							success('cached', app.cache[content.model.url]);
+						} else
 							content.model.fetch({
 								success: success,
 								error: function(){
@@ -503,11 +533,11 @@ define([
 							viewNames[c] = appc[i].views[j];
 							c++;
 						}
-						if(appc[i].modules)
+						if(appc[i].modules) 
 						for(var name in appc[i].modules) {
 							modules[d] = 'js/modules/'+name+'.' + that.viewFileExt;
 							//alert(modules[d]);
-							classNames[d] = appc[i].modules[name];
+							//classNames[d] = appc[i].modules[name]; //deprectaed
 							
 							d++;
 						}
