@@ -1,6 +1,6 @@
 define(['jquery', 'underscore', 'backbone', 'utils'], function($, _, Backbone, utils){
 
-	var CampusPageView = Backbone.View.extend({
+	app.views.CampusPage = Backbone.View.extend({
 		attributes: {"id": "campus"},
 
 		initialize: function(){
@@ -13,6 +13,4 @@ define(['jquery', 'underscore', 'backbone', 'utils'], function($, _, Backbone, u
 			return this;
 		}
 	});
-
-	return CampusPageView;
 });

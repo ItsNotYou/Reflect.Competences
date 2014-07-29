@@ -51,15 +51,15 @@ define(['jquery', 'underscore', 'backbone', 'utils'], function($, _, Backbone, u
 		}
 	};
 
-	var Opening = Backbone.Model.extend({
+	app.models.Opening = Backbone.Model.extend({
 	});
 
-	var Openings = Backbone.Collection.extend({
-		model: Opening,
+	app.models.Openings = Backbone.Collection.extend({
+		model: app.models.Opening,
 		url: 'js/json/opening.json'
 	});
 
-	var OpeningView = Backbone.View.extend({
+	app.views.OpeningView = Backbone.View.extend({
 		tagName: 'div',
 		attributes: {"data-role": 'collapsible'},
 
@@ -74,29 +74,22 @@ define(['jquery', 'underscore', 'backbone', 'utils'], function($, _, Backbone, u
 		}
 	});
 
-	var OpeningsView = Backbone.View.extend({
+	app.views.OpeningIndex = Backbone.View.extend({
 		anchor: '#opening-list',
 
 		initialize: function(){
-			_.bindAll(this, 'fetchSuccess', 'fetchError', 'render');
-			this.collection.fetch({
-				success: this.fetchSuccess,
-				error: this.fetchError
-			});
+			_.bindAll(this, 'render');
+			this.collection = new app.models.Openings();
 		},
 
-		fetchSuccess: function() {
+		beforeRender: function() {
 			//this.collection = _.sortBy(this.collection.attributes, 'name');
-
-      this.collection = this.addTextToTimes(this.collection);
-
-      var now = new Date();
-
-      _.each(this.collection.models, function(model){
-        model.attributes.statusOpenNow = dateutils.statusAtPlaceAndDate(model.attributes, now);
-      });
-
-			this.render();
+      		this.collection = this.addTextToTimes(this.collection);
+     		var now = new Date();
+	
+		 	_.each(this.collection.models, function(model){
+				model.attributes.statusOpenNow = dateutils.statusAtPlaceAndDate(model.attributes, now);
+		 	});
 		},
 
 		addTextToTimes: function (collection) {
@@ -135,16 +128,11 @@ define(['jquery', 'underscore', 'backbone', 'utils'], function($, _, Backbone, u
             // console.log('string',string);
             return string;
         },
-
-		fetchError: function() {
-			throw new Error('Error loading Opening-JSON file');
-		},
-
 		render: function() {
 			this.el = $(this.anchor);
 			// iterate over collection and call EmergencyCallViews render method
 			this.collection.each(function(opening){
-				var openingView = new OpeningView({model: opening});
+				var openingView = new app.views.OpeningView({model: opening});
 				$(this.el).append(openingView.render().el);
 			}, this);
 			this.el.trigger("create");
@@ -156,8 +144,8 @@ define(['jquery', 'underscore', 'backbone', 'utils'], function($, _, Backbone, u
 	/*
 	 *	Opening Page View
 	 */
-	var OpeningPageView = Backbone.View.extend({
-    attributes: {"id": "opening"},
+	app.views.OpeningPage = Backbone.View.extend({
+    	attributes: {"id": "opening"},
 
 		initialize: function(){
 			this.template = utils.rendertmpl('opening');
@@ -165,13 +153,10 @@ define(['jquery', 'underscore', 'backbone', 'utils'], function($, _, Backbone, u
 
     	render: function(){
     		$(this.el).html(this.template({}));
-    		var openings = new Openings();
-    		var openingsView = new OpeningsView({collection: openings});
     		$(this.el).trigger("create");
     		return this;
 		}
 
   });
 
-  return OpeningPageView;
 });
