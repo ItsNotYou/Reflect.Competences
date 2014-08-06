@@ -68,6 +68,6 @@ requirejs.onError = function(error){
 
 require(['jquery', 'app', 'jquerymobile', 'jquerymobile-config'], function($, App){
     $(function(){
-	   App.initialize();
+		app.initialize();
     });
 });

@@ -41,6 +41,18 @@ define([
 					/**
 				 * Override Backbone.sync to automatically include auth headers according to the url in use
 				 */
+
+				$(document).ready(function() {
+  					document.addEventListener("deviceready", onDeviceReady, false);
+				});
+
+				function onDeviceReady() {
+    				navigator.splashscreen.hide();
+				}
+
+				/**
+		 	 	 * Override Backbone.sync to automatically include auth headers according to the url in use
+		 	 	 */
 				function overrideBackboneSync() {
 					var authUrls = ["http://api.uni-potsdam.de/endpoints/roomsAPI"];
 					var isStartOf = function(url) {
@@ -48,7 +60,7 @@ define([
 							return _.str.startsWith(url, authUrl);
 						};
 					};
-	
+
 					var sync = Backbone.sync;
 					Backbone.sync = function(method, model, options) {
 						var url = options.url || _.result(model, "url");
@@ -58,6 +70,11 @@ define([
 						sync(method, model, options);
 					};
 				}
+
+				/**
+			 	 * Initialize Backbone override
+			 	 */
+				$(overrideBackboneSync);
 	
 				/**
 				 * Initialize Backbone override

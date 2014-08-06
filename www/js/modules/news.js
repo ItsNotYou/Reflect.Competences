@@ -1,6 +1,6 @@
 define(['jquery', 'underscore', 'backbone', 'utils', 'date'], function($, _, Backbone, helper, date){
 	var classes = {};
-	
+
 	/*
 	 *	Backbone Model - NewsEntry
 	 */

@@ -52,7 +52,7 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'date'], function($, _, Bac
 			$(this.el, this.page).trigger("create");
 			return this;
 		},
-		
+
 		/*
 		* Das aktuell angezeigte Event im Kalender speichern
 		*/
