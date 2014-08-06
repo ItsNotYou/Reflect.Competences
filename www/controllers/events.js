@@ -37,7 +37,7 @@ app.controllers.events = BackboneMVC.Controller.extend({
 			//console.log(d);
 			if(!d) return;
 			self.events = d.events;
-			self.places = d.places; //places lokal speichern
+			self.places = d.places; //places-liste lokal speichern
 			//self.filterIndex(); //Events filtern nach locations und gewählter Zeitraum
 			//self.setActiveBtn(); //Aktiven Button markieren im Footer
 		});
@@ -141,30 +141,5 @@ app.controllers.events = BackboneMVC.Controller.extend({
 		$('#btn-'+this.filter+'-events', app.footer).addClass(klasse);
 	},
 	
-	/*
-	* Das aktuell angezeigte Event im Kalender speichern
-	*/
-	saveToCalendar:function(){
-		if(!this.currentEvent)
-			return;
-		var e = this.currentEvent;
-		var saved = false;
-
-		window.plugins.calendar.createEvent(e.Event.name, e.Place.name, e.Event.description, new Date(parseInt(e.Event.startTime) * 1000), new Date((parseInt(e.Event.startTime) + 3600) * 1000 ),
-			function(m){ //Bei erfolgreichem Speichern ausgeführt, unter Android leider nicht ausgeführt
-				navigator.notification.alert(e.Event.name + ' am ' + e.Event.DateString + ' wurde deinem Kalender hinzugefügt.', null, 'Gespeichert'); //Nachricht ausgeben
-				LocalStore.set('going', e.Event.id, e.Event.id); //Vorgemerkt im Local Storage speichern
-				$('#savedInCal'+e.Event.id).show(); //VOrgemerkt Häckchen anzeigen
-				saved = true;
-				track('events/calendar/'+e.Event.id+'/saved'); //Aktion tracken
-			},
-			function(m){ //Bei einem Fehler beim Speichern ausgeführt
-				if(m != 'User cancelled')
-				navigator.notification.alert("Das Event konnte nicht in deinem Kalender gespeichert werden. Bitte überprüfe in den Einstellungen ob du der App den Zugriff auf deinen Kalender erlaubst.", null, 'Fehler'); //Fehlermeldung ausgeben
-				saved = false;
-				track('events/calendar/'+e.Event.id+'/canceled'); //Aktion tracken
-			}
-		);
-	},
 	
 });

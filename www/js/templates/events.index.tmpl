@@ -22,7 +22,7 @@
 			if(date('d.m.Y') == date('d.m.Y', e.startTime))
 				klasse += ' show-today';
 			img = e.pic_square ? '<img class="event-thumb" src="'+ e.pic_square + '" />' : '';
-			marked = '<br /><span class="relative floatL vorgemerkt">Vorgemerkt</span>';
+			marked = going[e.id] ? '<br /><span class="relative floatL vorgemerkt">Vorgemerkt</span>' : '';
 			%>
 				<li<%=extra%> class="<%=klasse%>" id="<%= e.id%>"><a href="events/view/<%= e.id %>">
 					<%= img %>
@@ -35,3 +35,12 @@
 				</li>
 	<% }); %>
 </ul>
+<div class="footer">
+	<div data-role="navbar" data-tap-toggle="false">
+		<ul>
+			<li><a class="btn-filter-events" href="events/index/all" id="btn-all-events">Alle</a></li>
+			<li><a class="btn-filter-events" href="events/index/today" id="btn-today-events">Heute</a></li>
+			<li><a class="btn-filter-events" href="events/index/next" id="btn-next-events">Nächste</a></li>
+		</ul>
+	</div>
+</div>

@@ -182,6 +182,7 @@ define([
 				var success = function(s, d){
 					console.log(d);
 					if(content) {
+						content.p = params;
 						if(content.beforeRender)
 							content.beforeRender();
 						if(s == 'set') { //Model aus collection geholt
@@ -237,7 +238,7 @@ define([
 				if(app.views[utils.capitalize(c) + utils.capitalize(a)]) { //Wenn eine View-Klasse für Content vorhanden ist: ausführen
 					content = new app.views[utils.capitalize(c) + utils.capitalize(a)](params);
 					content.page = $(page.el);
-					if((content.model || content.collection) && content.inCollection) { //Element aus der geladener Colelction holen und nicht vom Server
+					if((content.model || content.collection) && content.inCollection) { //Element aus der geladener Collection holen und nicht vom Server
 						var parts = content.inCollection.split('.');
 						try {
 							var list = eval('app.data.' + content.inCollection);
@@ -440,12 +441,12 @@ define([
 					window.footerAnimating = true;
 					var dir = window.reverseTransition ? 1 : -1; //Transitionsrichtung für Footeranimation ermitteln
 					if(footer.length > 0) { //Wenn die Seite einen Footer hat, anzeigen und animieren
-						self.footerContent[0].innerHTML = footer[0].innerHTML;
+						/*
 						self.footer[0].style.display = 'block';
 						self.footer.animate({'left':0}, duration, function(){
 							window.footerAnimating = false;
 							self.updateLayout();
-						});
+						});*/
 					} else {  //Sonst Footer ausblenden
 						self.footer.animate({'left':(self.footer.width() * dir)+'px'}, duration, function(){
 							self.footer[0].style.display = 'none';
@@ -460,7 +461,7 @@ define([
 				});
 		
 				$(document).on('click', 'a', function(e){ //Alle Link-Klicks abfangen für internes Backbone-Routing
-					var href = $(this).attr('href');
+					var href = $(this).attr('href') || '';
 					var target = $(this).attr('target');
 					var mapRequest = !(href.indexOf('maps:') == -1 && href.indexOf('geo:') == -1);
 					if(href && href.indexOf('javascript:') == -1 && href.indexOf('http://') == -1 && !mapRequest) {

@@ -21,6 +21,7 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'date'], function($, _, Bac
 		url: 'http://headkino.de/potsdamevents/json/events/',
 
 		initialize: function(){
+
 		},
 
 		parse: function(response){
@@ -35,6 +36,7 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'date'], function($, _, Bac
 
 	app.views.EventsView = Backbone.View.extend({
 		el: '#events',
+		events : {'click .saveToCal': 'saveToCalendar'},
 		inCollection : 'events.index.events', //controller.action.variable
 		idInCollection : 'id', //name oder . getrennter Pfad, wo die id in der collection steht für ein objekt
 		initialize: function(p){
@@ -49,6 +51,30 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'date'], function($, _, Bac
 			$(this.el, this.page).html(this.template(vars));
 			$(this.el, this.page).trigger("create");
 			return this;
+		},
+		
+		/*
+		* Das aktuell angezeigte Event im Kalender speichern
+		*/
+		saveToCalendar:function(){
+			var e = this.model.toJSON();
+			if(!e.Event)
+				e = e.event;
+			var saved = false;
+			window.plugins.calendar.createEvent(e.Event.name, e.Place.name, e.Event.description, new Date(parseInt(e.Event.startTime) * 1000), new Date((parseInt(e.Event.startTime) + 3600) * 1000 ),
+				function(m){ //Bei erfolgreichem Speichern ausgeführt, unter Android leider nicht ausgeführt
+					navigator.notification.alert(e.Event.name + ' am ' + e.Event.DateString + ' wurde deinem Kalender hinzugefügt.', null, 'Gespeichert'); //Nachricht ausgeben
+					LocalStore.set('going', e.Event.id, e.Event.id); //Vorgemerkt im Local Storage speichern
+					$('#savedInCal'+e.Event.id).show(); //VOrgemerkt Häckchen anzeigen
+					saved = true;
+					track('events/calendar/'+e.Event.id+'/saved'); //Aktion tracken
+				},
+				function(m){ //Bei einem Fehler beim Speichern ausgeführt
+					if(m != 'User cancelled')
+					navigator.notification.alert("Das Event konnte nicht in deinem Kalender gespeichert werden. Bitte überprüfe in den Einstellungen ob du der App den Zugriff auf deinen Kalender erlaubst.", null, 'Fehler'); //Fehlermeldung ausgeben
+					saved = false;
+				}
+			);
 		}
 
 	});
@@ -68,7 +94,7 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'date'], function($, _, Bac
 		},
 
 		render: function(){
-			console.log($.extend({events: this.collection.toJSON()}, this.p));
+			console.log(this.p);
 			$(this.el).html(this.template($.extend({events: this.collection.toJSON()}, this.p)));
 			$(this.el).trigger("create");
 			return this;
