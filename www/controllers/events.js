@@ -4,8 +4,7 @@
 app.controllers.events = BackboneMVC.Controller.extend({
     name: 'events',
 	places: false,
-	views:["events.index","events.view","events.set_locations","events.place"], //View files des Controllers
-	modules : {'events' : 'EventsPageView'},
+	modules : {'events' : ''},
 	
     view:function(id){
 		var self = this;
@@ -58,7 +57,7 @@ app.controllers.events = BackboneMVC.Controller.extend({
 	set_locations: function(){
 		if(this.places) { //Wenn die Locations schon lokal vorhanden sind Seite anzeigen
 			app.loadPage(this.name, 'set_locations', {places:this.places, disabledLocations:this.disabledLocations}).done(function(){
-				track('events/set_locations'); //Aktion tracken
+				
 			});
 		} else { //Sonst zu events/index gehen
 			app.route('events/index');

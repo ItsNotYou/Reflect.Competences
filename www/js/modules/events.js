@@ -95,8 +95,8 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'date'], function($, _, Bac
 
 		render: function(){
 			console.log(this.p);
-			$(this.el).html(this.template($.extend({events: this.collection.toJSON()}, this.p)));
-			$(this.el).trigger("create");
+			this.$el.html(this.template($.extend({events: this.collection.toJSON()}, this.p)));
+			this.$el.trigger("create");
 			return this;
 		}
 	});
