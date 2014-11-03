@@ -13,6 +13,6 @@ define(['jquery', 'underscore', 'backbone', 'utils'], function($, _, Backbone, u
 			return this;
 		}
 	});
-
+	//Just testing
 	return HomePageView;
 });
