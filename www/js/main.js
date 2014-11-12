@@ -1,7 +1,3 @@
-/**
- *  file contains all Require.JS dependencies
- */
-var app = {models:{}, views:{}, data:{}};
 require.config({
     //Standardmäßig alles aus dem lib-Pfad laden
     baseUrl: 'js',
@@ -31,6 +27,11 @@ require.config({
     		deps: ['jquery', 'underscore'],
     		exports: 'Backbone'
     	},
+		 // use namespace Backbone
+    	'backboneMVC': {
+    		deps: ['backbone'],
+    		exports: 'BackboneMVC'
+    	},
         // use namespace _
     	'underscore': {
     		exports: '_'
@@ -51,8 +52,8 @@ require.config({
 
         'lib/jqm-datebox.mode.calbox.min' : ['jquery', 'datebox'],
         'lib/jqm-datebox.mode.datebox.min' : ['jquery', 'datebox'],
-        'lib/jquery.mobile.datebox.i18n.de.utf8' : ['jquery', 'datebox'],
-        'cache': ['backbone', 'underscore']
+        'lib/jquery.mobile.datebox.i18n.en_US.utf8' : ['jquery', 'datebox'],
+		'cache': ['backbone', 'underscore']
     }
 
 });
@@ -69,6 +70,6 @@ requirejs.onError = function(error){
 
 require(['jquery', 'app', 'jquerymobile', 'jquerymobile-config'], function($, App){
     $(function(){
-
+		app.initialize();
     });
 });
