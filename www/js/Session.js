@@ -1,8 +1,7 @@
 define([
   'jquery',
   'backbone',
-  'router'
-], function($, Backbone, Router){
+], function($, Backbone){
 
     var Session = Backbone.Model.extend({
 

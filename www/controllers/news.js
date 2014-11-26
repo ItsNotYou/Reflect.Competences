@@ -57,6 +57,7 @@ app.controllers.news = BackboneMVC.Controller.extend({
 	* Newsliste einer Quelle
 	*/
 	source: function(id){
+		alert(1);
 		app.loadPage(this.name, 'source', {id:id}).done(function(){
 			
 		});

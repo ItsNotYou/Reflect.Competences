@@ -135,6 +135,11 @@ define([
 			return this;
 		}
 	});
+	
+	var capitalize = function(string)
+	{
+		return string.charAt(0).toUpperCase() + string.slice(1);
+	};
 
 	/*
 	* Betriebssystem/UserAgent ermitteln
@@ -277,10 +282,10 @@ define([
 
 		var info = new Backbone.Model;
 		info.url = "https://api.uni-potsdam.de/endpoints/errorAPI/rest/log";
-		info.set("uuid", uuid);
-		info.set("message", errorMessage);
-		info.set("url", errorUrl);
 		info.set("line", lineNumber);
+		info.set("url", errorUrl);
+		info.set("message", errorMessage);
+		info.set("uuid", uuid);
 		info.set("column", columnNumber);
 
 		console.log("Unhandled error thrown:");
@@ -342,6 +347,7 @@ define([
 			overrideExternalLinks: overrideExternalLinks,
 			detectUA:detectUA,
 			onError: onError,
+			capitalize:capitalize,
 			LocalStore: LocalStore
 		};
 });

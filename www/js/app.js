@@ -1,4 +1,4 @@
-var app;
+var app = {models:{},views:{},controllers:{}};
 define([
 	'jquery',
 	'underscore',
@@ -9,6 +9,7 @@ define([
 	'q',
 	'fastclick',
 	'jquerymobile',
+	'datebox',
 	'LocalStore',
 	], function($, _, Backbone, BackboneMVC, _str, utils, Q, FastClick){
 		//AppRouter-Klasse erstellen
@@ -122,6 +123,7 @@ define([
 					}
 				});
 				this.loadControllers(this.controllerList); //Alle Controller laden
+				$(document).on("click", "a", utils.overrideExternalLinks);
 			},
 			history:[], //trackt aufgerufene URLs unabhängig von Backbone um auf Fehler besser reagieren zu können
 			/*
@@ -194,15 +196,14 @@ define([
 			loadPage: function(c, a, params, transition){
 				var q = Q.defer();
 				
-				if(!this.currentView){
+				/*if(!this.currentView){
 					$('#pagecontainer').children().first().remove();
-				}
+				}*/
 				
 				
 				var page = new app.views[utils.capitalize(c) + 'Page'];
 				console.log(page.el);
 				// prepare new view for DOM display
-				$(page.el).attr('data-role', 'page');
 				//$(page.el).attr(page.attributes);
 				
 				page.render();
@@ -210,9 +211,17 @@ define([
 
 				var d = {}, response = {};
 			
-				$('body').css('overflow', 'hidden');
-				$('#nav-panel').css('display', 'none');
-				$('#pagecontainer').html($(page.el)); //Nur eine Seite im Container, damit keine ID-Konflikte auftreten
+				/*$('body').css('overflow', 'hidden');
+				$('#nav-panel').css('display', 'none');*/
+				
+				var header = page.$("[data-role=header]").detach().toolbar();
+				var pageContent = page.$el.attr("data-role", "page");
+				$('#pagecontainer').append(pageContent);
+				$('#pagecontainer').before(header);
+				var transition = $.mobile.changePage.defaults.transition;
+				var reverse = $.mobile.changePage.defaults.reverse;
+				
+				//$('#pagecontainer').html($(page.el)); //Nur eine Seite im Container, damit keine ID-Konflikte auftreten
 				
 				var transition = $.mobile.defaultPageTransition;
 				// Erste Seite nicht sliden
@@ -273,7 +282,13 @@ define([
 						content.render();
 					}
 					console.log(page.el);
-					Q($.mobile.changePage($(page.el), {changeHash: false, transition: transition})).done(function(){
+					Q($.mobile.changePage(pageContent, {changeHash: false, transition: transition, reverse: reverse})).done(function(){
+						if(!this.currentView){
+							//$('#pagecontainer').children().first().remove();
+							$('body').css('overflow', 'auto');
+							$("body").fadeIn(100);
+						}
+						this.currentView = page;
 						q.resolve(d, content);
 					});
 				}
@@ -417,7 +432,7 @@ define([
 					track(url);
 					q.resolve(app.requests[url]);
 				} else {
-					$.getJSON(this.jsonUrl + url + '?testcode='+this.testcode).done(function(d){ app.requests[url] = d; app.cacheTimes[url] = Date.now(); q.resolve(d);}); //Url anfragen
+					$.getJSON(this.jsonUrl + url).done(function(d){ app.requests[url] = d; app.cacheTimes[url] = Date.now(); q.resolve(d);}); //Url anfragen
 				}
 				return q.promise;
 			},
@@ -499,6 +514,7 @@ define([
 					}
 					self.updateLayout(animating);
 				});
+				
 				$(document).on('click', 'a[data-rel="back"]', function(){ //Backbutton clicks auf zurücknavigieren mappen
 					window.history.back();
 				});

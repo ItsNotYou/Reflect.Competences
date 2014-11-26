@@ -82,7 +82,7 @@ define(['jquery', 'underscore', 'backbone', 'utils'], function($, _, Backbone, u
 		},
 
 		render:function(){
-			this.$el = this.page.$el.find('#news');
+			this.$el = this.page.find('#news');
 			var vars = $.extend(this.model.toJSON(), this.p);
 			if(!vars.news)
 				vars.news = vars;
@@ -111,7 +111,7 @@ define(['jquery', 'underscore', 'backbone', 'utils'], function($, _, Backbone, u
 		},
 
 		render:function(){
-			this.$el = this.page.$el.find('#news');
+			this.$el = this.page.find('#news');
 			this.$el.html(this.template({news: this.collection.toJSON()}));
 			this.$el.trigger("create");
 			$.mobile.changePage.defaults.reverse = true;
@@ -131,7 +131,7 @@ define(['jquery', 'underscore', 'backbone', 'utils'], function($, _, Backbone, u
 		},
 
 		render:function(){
-			this.$el = this.page.$el.find('#news');
+			this.$el = this.page.find('#news');
 			//console.log(utils.LocalStore.get('disabledNews', {}));
 			this.$el.html(this.template({newsSources: app.data.newsSources, disabledNews: utils.LocalStore.get('disabledNews', {})}));
 			$('.ch-news').change(this.toggleNews);
@@ -170,12 +170,13 @@ define(['jquery', 'underscore', 'backbone', 'utils'], function($, _, Backbone, u
 				error: function(){
 					var errorPage = new utils.ErrorView({el: '#news', msg: 'Die Neuigkeiten konnten nicht abgerufen werden.', module: 'news'});
 				},
-				dataType: 'json' });
+				dataType: 'json'
+			});
 		},
 
 		render: function(){
 			app.data.newsSources = this.collection.response.newsSources;
-			this.$el = this.page.$el.find('#news');
+			this.$el = this.page.find('#news');
 			this.$el.html(this.template({news: this.collection.toJSON(), disabledNews: utils.LocalStore.get('disabledNews', {})}));
 			this.$el.trigger("create");
 			$.mobile.changePage.defaults.reverse = false;

@@ -12,6 +12,7 @@ require.config({
     	'underscore': 'vendor/underscore-min',
         'underscore-string': 'vendor/underscore.string.min',
     	'backbone': 'vendor/backbone-min',
+		'backboneMVC': 'vendor/backbone-mvc',
         'cache': 'vendor/backbone.fetch-cache.min',
         'geojson': 'lib/GeoJSON',
         'q': 'vendor/q',

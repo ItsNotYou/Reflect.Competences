@@ -69,7 +69,7 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'date'], function($, _, Bac
 			var vars = this.model.toJSON();
 			if(!vars.event)
 				vars.event = vars;
-			this.$el = this.page.$el.find('#events');// $(this.el, this.page.$el)
+			this.$el = this.page.find('#events');// $(this.el, this.page.$el)
 			vars = $.extend(vars, {going:Boolean(utils.LocalStore.get('going', {})[vars.event.Event.id])});
 			this.$el.html(this.template(vars));
 			this.$el.trigger("create");
@@ -134,7 +134,7 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'date'], function($, _, Bac
 		},
 
 		render: function(){
-			this.$el = this.page.$el.find('#events');
+			this.$el = this.page.find('#events');
 			console.log(this.$el);
 			this.$el.html(this.template({events: this.collection.toJSON(), date:date, going:utils.LocalStore.get('going', {})}));
 			var self = this;
@@ -156,7 +156,7 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'date'], function($, _, Bac
 		},
 
 		render:function(){
-			this.$el = this.page.$el.find('#events');
+			this.$el = this.page.find('#events');
 			this.$el.html(this.template({places: app.data.places, disabledLocations: utils.LocalStore.get('disabledLocations', {})}));
 			$('.ch-location').change(this.toggleLocation);
 			this.$el.trigger("create");
@@ -194,7 +194,8 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'date'], function($, _, Bac
 				error: function(){
 					var errorPage = new utils.ErrorView({el: '#events', msg: 'Die Veranstaltungen konnten nicht abgerufen werden.', module: 'events'});
 				},
-				dataType: 'json' });
+				dataType: 'json' 
+			});
 		},
 
 		fetchError: function(){
@@ -203,7 +204,7 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'date'], function($, _, Bac
 
 		render: function(){
 			app.data.places = this.collection.response.places;
-			this.$el = this.page.$el.find('#events');
+			this.$el = this.page.find('#events');
 			this.$el.html(this.template({events: this.collection.toJSON(), date:date, going:utils.LocalStore.get('going', {})}));
 			var self = this;
 			$('.btn-filter-events').click(function(e){
