@@ -402,6 +402,11 @@ label.showfirst {
 	background-color: transparent;
 }
 
+.ui-icon-arrow-white:after {
+	background-image: url(../img/up/arrow-white.png);
+	background-color: transparent;
+}
+
 /* Sorter
 -------------------- */
 #sorter .ui-li.ui-li-static.ui-btn-up-c {
@@ -974,6 +979,12 @@ ui-collapsible-heading-toggle,li.ui-collapsible h3.ui-collapsible-heading a,ui-c
 	max-width: 600px;
 }
 
+#opening .ui-table td,
+#transport2 .ui-table td {
+	padding-top: 0px;
+	padding-bottom: 0px;
+}
+
 #transport_rides a.ui-btn span {
 	text-indent: 0.3em !important;
 	display: inline-block;
@@ -1053,12 +1064,14 @@ ui-collapsible-heading-toggle,li.ui-collapsible h3.ui-collapsible-heading a,ui-c
 }
 /**********************Suche******************
 *****************************************************/
+#people .ui-input-btn,
 #library .ui-input-btn {
 	color: none;
 	font-weight: normal;
 	text-transform: uppercase;
 }
 
+#people .ui-input-btn input,
 #library .ui-input-btn input {
 	color: none !important;
 }
@@ -1688,12 +1701,17 @@ li.book-short:hover div.media_x,li.book-short:active div.media_x {
 	right: .5em;
 }
 
+#people-list .ui-btn-icon-left:after{
+	top: 2em;
+	left: 0.9em;
+}
+
 .mail {
 	background-image: url(../img/up/mail-small.png) !important;
 	background-repeat: no-repeat;
 	background-position: 0px .2em;
 	text-indent: 20px;
-	padding-left: 20px;
+	padding-left: 50px;
 }
 
 .phone {
@@ -1701,7 +1719,7 @@ li.book-short:hover div.media_x,li.book-short:active div.media_x {
 	background-repeat: no-repeat;
 	background-position: 0px .2em;
 	text-indent: 20px;
-	padding-left: 20px;
+	padding-left: 50px;
 }
 
 #emergency-list .ui-collapsible-content p,#people-list .ui-collapsible-content p
@@ -1845,6 +1863,10 @@ li.lecture-group-detail {
 h3.lecture-group-name {
 	margin: 12px !important;
 	margin-left: 5px !important;
+}
+
+.lecture-group-puls-link {
+	margin: 5px;
 }
 
 #lectures .ui-selectmenu-list li a {
@@ -2425,6 +2447,21 @@ p.event-description {
 .saveToCal {
 	background-color:#014260 !important;
 	color:#fff !important;
+}
+
+.gradeAverages h2 {
+	font-weight: bold;
+	color: #fff;
+	background-color: #014260;
+	margin: 0px;
+	padding-left: 8px;
+	padding-right: 8px;
+	padding-bottom: 13px;
+	padding-top: 13px;
+}
+
+.grade-right-aligned {
+	float: right !important;
 }
 
 /* Slide transition speed */

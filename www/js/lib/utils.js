@@ -3,8 +3,10 @@ define([
 	'underscore',
 	'backbone',
 	'app',
-	'Session'
-], function($, _, Backbone, app, Session){
+	'Session',
+	'hammerjs',
+	'uri/URI'
+], function($, _, Backbone, app, Session, Hammer, URI){
 
 	/*
 	 * Template Loading Functions
@@ -212,6 +214,7 @@ define([
 		}
 	});
 	
+
 	// At most one InAppBrowser window should be opened at any time
 	var hasOpenInAppBrowser = false;
 	
@@ -221,45 +224,62 @@ define([
 			hasOpenInAppBrowser = false;
 		});
 	};
+	
+	var openInTab = function(url) {
+		if (hasOpenInAppBrowser) {
+			console.log("InAppBrowser open, " + url + " won't be opened");
+		} else {
+			hasOpenInAppBrowser = true;
+		}
+		
+		var moodlePage = "https://moodle2.uni-potsdam.de/";
+		if (url.indexOf(moodlePage) != -1){
+			var session = new Session();
 
+			$.post("https://moodle2.uni-potsdam.de/login/index.php",
+				{
+					username: session.get('up.session.username'),
+					password: session.get('up.session.password')
+				}
+			).done(function(response) {
+				openInAppBrowser(url);
+			}).fail(function() {
+				hasOpenInAppBrowser = false;
+			});
+		} else {
+			openInAppBrowser(url);
+		}
+	}
+	
 	/**
-	 * Opens external links (identified by rel="external") according to the platform we are on. For apps this means using the InAppBrowser, for desktop browsers this means opening a new tab.
+	 * Opens external links according to the platform we are on. For apps this means using the InAppBrowser, for desktop browsers this means opening a new tab.
 	 */
 	var overrideExternalLinks = function(event) {
 		var url = $(event.currentTarget).attr("href");
+		var uri = new URI(url);
 		
-		if (hasOpenInAppBrowser) {
-			console.log("InAppBrowser open, " + url + " won't be opened");
+		var internalProtocols = ["http", "https"];
+		var isInternalProtocol = internalProtocols.indexOf(uri.protocol()) >= 0;
+		var hasProtocol = uri.protocol() !== '';
+		
+		// In the app we consider three cases:
+		// 1. Protocol is empty (URL is relative): we let the browser handle it
+		// 2. Protocol is http or https and URL is absolute: we let an InAppBrowser tab handle it
+		// 3. Protocol is something other: we let the system handle it
+		// In the browser, we let the browser handle everything
+		if (window.cordova && isInternalProtocol) {
+			console.log("Opening " + uri + " in new tab");
+			openInTab(url);
 			return false;
-		}
-		
-		if (window.cordova) {
-			hasOpenInAppBrowser = true;
-			console.log("Opening " + url + " externally");
-			
-			var moodlePage = "https://moodle2.uni-potsdam.de/";
-			if (url.indexOf(moodlePage) != -1){
-				var session = new Session();
-
-				$.post("https://moodle2.uni-potsdam.de/login/index.php",
-					{
-						username: session.get('up.session.username'),
-						password: session.get('up.session.password')
-					}
-				).done(function(response) {
-					openInAppBrowser(url);
-				}).fail(function() {
-					hasOpenInAppBrowser = false;
-				});
-			} else {
-				openInAppBrowser(url);
-			}
+		} else if (window.cordova && hasProtocol && !isInternalProtocol) {
+			console.log("Opening " + uri + " in system");
+			window.open(url, "_system");
 			return false;
 		} else {
 			console.log("Opening " + url + " internally");
 		}
 	};
-
+	
 	/**
 	 * Generates a uuid v4. Code is taken from broofas answer in http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript
 	 */
@@ -335,6 +355,83 @@ define([
 		},
 
 	};
+	
+	var GesturesView = Backbone.View.extend({
+		
+		delegateEventSplitter: /^(\S+)\s*(.*)$/,
+		gestures: ["swipeleft", "swiperight"],
+		gesturesCleanup: [],
+		
+		/**
+		 * Code taken from original implementation
+		 */
+		delegateEvents: function(events) {
+			if (!(events || (events = _.result(this, 'events')))) return this;
+			this.undelegateEvents();
+			for (var key in events) {
+				var method = events[key];
+				if (!_.isFunction(method)) method = this[events[key]];
+				if (!method) continue;
+				
+				var match = key.match(this.delegateEventSplitter);
+				var eventName = match[1], selector = match[2];
+				method = _.bind(method, this);
+				
+				/** This block is new */
+				if (_.contains(this.gestures, eventName)) {
+					var elements = undefined;
+					if (selector === '') {
+						elements = this.$el.get();
+					} else {
+						elements = this.$(selector).get();
+					}
+					
+					var that = this;
+					$.each(elements, function(index, el) {
+						var hammer = new Hammer(el);
+						hammer.on(eventName, method);
+						that.gesturesCleanup.push(function() { hammer.off(eventName); });
+					});
+					
+					continue;
+				}
+				
+				eventName += '.delegateEvents' + this.cid;
+				if (selector === '') {
+					this.$el.on(eventName, method);
+				} else {
+					this.$el.on(eventName, selector, method);
+				}
+			}
+			return this;
+		},
+		
+		/**
+		 * Code taken from original implementation
+		 */
+		undelegateEvents: function() {
+			this.$el.off('.delegateEvents' + this.cid);
+			
+			/** This block is new */
+			for (var count = 0; count < this.gesturesCleanup.length; count++) {
+				this.gesturesCleanup[count].apply(this);
+			}
+			this.gesturesCleanup = [];
+			
+			return this;
+		},
+	});
+	
+	var activateExtendedAjaxLogging = function() {
+		$(document).ajaxError(function(event, jqHXR, ajaxSettings, thrownError) {
+			console.log("Error handler activated");
+			console.log(jqHXR.status + ": " + jqHXR.statusText);
+			console.log(jqHXR.responseText);
+			console.log("Thrown error: " + thrownError);
+			console.log("URL: " + ajaxSettings.url);
+			console.log("Authorization: " + ajaxSettings.headers["Authorization"]);
+		});
+	};
 
 	return {
 			rendertmpl: rendertmpl,
@@ -348,6 +445,8 @@ define([
 			detectUA:detectUA,
 			onError: onError,
 			capitalize:capitalize,
-			LocalStore: LocalStore
+			LocalStore: LocalStore,
+			GesturesView: GesturesView,
+			activateExtendedAjaxLogging: activateExtendedAjaxLogging
 		};
 });

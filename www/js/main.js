@@ -20,7 +20,9 @@ require.config({
         'utils': 'lib/utils',
 		'date': 'lib/date',
 		'LocalStore': 'lib/ls-store',
-        'fastclick': 'vendor/fastclick.min'
+        'fastclick': 'vendor/fastclick.min',
+        'hammerjs': 'vendor/hammer.min',
+        'uri': 'vendor/src'
     },
     shim: {
         // use namespace Backbone
@@ -50,13 +52,12 @@ require.config({
             deps: ['jquery', 'jquerymobile'],
             exports: 'datebox'
         },
-
+        
         'lib/jqm-datebox.mode.calbox.min' : ['jquery', 'datebox'],
         'lib/jqm-datebox.mode.datebox.min' : ['jquery', 'datebox'],
         'lib/jquery.mobile.datebox.i18n.en_US.utf8' : ['jquery', 'datebox'],
 		'cache': ['backbone', 'underscore']
     }
-
 });
 
 requirejs.onError = function(error){

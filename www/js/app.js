@@ -38,7 +38,9 @@ define([
 					"https://api.uni-potsdam.de/endpoints/pulsAPI",
 					"https://api.uni-potsdam.de/endpoints/moodleAPI",
 					"https://api.uni-potsdam.de/endpoints/transportAPI/1.0/",
-					"https://api.uni-potsdam.de/endpoints/errorAPI"],
+					"https://api.uni-potsdam.de/endpoints/errorAPI",
+					"https://api.uni-potsdam.de/endpoints/personAPI"
+			],
 			cache: {},
 			viewFileExt: 'js', //Dateiendung der View files
 			router : new AppRouter(), //Router zuweisen
@@ -101,11 +103,10 @@ define([
 			 	 * Initialize Backbone override
 			 	 */
 				$(overrideBackboneSync);
-	
-				/**
-				 * Initialize Backbone override
-				 */
-				$(overrideBackboneSync);
+
+				// Initialize external link override
+				$(document).on("click", "a", utils.overrideExternalLinks);
+
 				// Register global error handler
 				window.onerror = utils.onError;
 				

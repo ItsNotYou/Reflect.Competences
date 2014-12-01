@@ -140,7 +140,7 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'q', 'moment'], function($,
     keywords: function(node, tagName){
       var keywords = this.contentForTag(node, tagName);
       var keys = _.map(keywords, function(keyword){
-        var url = 'https://opac.ub.uni-potsdam.de/DB=1/SET=1/TTL=2/MAT=/NOMAT=T/CMD?ACT=SRCHA&IKT=5040&TRM='+encodeURIComponent(keyword.trim());
+        var url = 'http://opac.ub.uni-potsdam.de/DB=1/SET=1/TTL=2/MAT=/NOMAT=T/CMD?ACT=SRCHA&IKT=5040&TRM='+encodeURIComponent(keyword.trim());
         var key = [keyword.trim(), url];
         return key;
       });
@@ -269,10 +269,6 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'q', 'moment'], function($,
       return (this.get('results').length < this.get('numberOfRecords'));
     },
 
-    startPagination: function() {
-      return this.get('results').length + 1;
-    },
-
     endPagination: function() {
       return Math.min(this.get('results').length + 10, this.get('numberOfRecords'));
     },
@@ -302,7 +298,7 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'q', 'moment'], function($,
       // get relevant pagination information
       if(data.getElementsByTagNameNS) {
         if (!data.getElementsByTagNameNS('http://www.loc.gov/zing/srw/','numberOfRecords')[0]){
-          var errorPage = new utils.ErrorView({el: '#search-results', msg: 'Die Bibliothekssuche ist momentan nicht erreichbar oder Sie haben einen Leerstring eingegeben.', module: 'library'});
+          this.set('numberOfRecords',0);
         }else{
           var numberOfRecords=data.getElementsByTagNameNS('http://www.loc.gov/zing/srw/','numberOfRecords')[0].textContent;
           this.set('numberOfRecords',numberOfRecords);
@@ -359,7 +355,6 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'q', 'moment'], function($,
       var html = this.template({
         search:             search.attributes,
         paginationPossible: search.paginationPossible(),
-        startPagination:    search.startPagination(),
         endPagination:      search.endPagination(),
         booklist: this.collection.models
       });
@@ -402,6 +397,20 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'q', 'moment'], function($,
     render: function(){
       var html = this.template({book:this.model});
       this.$el.html(html);
+      this.$(".infotext-header-show").show();
+      this.$(".infotext-header-hide").hide();
+      this.$(".infotext").collapsible({
+
+        collapse: function() {
+          $(".infotext-header-show").show();
+          $(".infotext-header-hide").hide();
+        },
+
+        expand: function() {
+          $(".infotext-header-show").hide();
+          $(".infotext-header-hide").show();
+        }
+      });
       this.$el.trigger('create');
       return this;
     }
