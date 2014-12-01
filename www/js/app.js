@@ -215,9 +215,10 @@ define([
 				$('#nav-panel').css('display', 'none');*/
 				
 				var header = page.$("[data-role=header]").detach().toolbar();
+				header.addClass('ui-page-theme-a');
 				var pageContent = page.$el.attr("data-role", "page");
 				$('#pagecontainer').append(pageContent);
-				$('#pagecontainer').before(header);
+				$('#pagecontainer').prepend(header);
 				var transition = $.mobile.changePage.defaults.transition;
 				var reverse = $.mobile.changePage.defaults.reverse;
 				
