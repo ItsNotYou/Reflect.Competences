@@ -23,7 +23,7 @@ define([
 		app = {
 			c: {}, //Controller-Objekte werden in diesem Array abgelegt
 			controllers: {}, //Controllerklassen
-			controllerList: ["controllers/main", "controllers/events", "controllers/news", "controllers/campus", "controllers/opening"], //In der app vorhandene Controller
+			controllerList: ["controllers/main", "controllers/events", "controllers/news", "controllers/opening"], //In der app vorhandene Controller
 			viewType:"text/x-underscore-template", //Templateenginekennung (Underscore)
 			requests : [], //Speichert die Rückgabe für jede URL (Cache)
 			cacheTimes: [], //Speichert für jede URL die letzte Zeit, wann diese vom Server geladen wurde
