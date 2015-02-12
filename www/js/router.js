@@ -26,8 +26,9 @@ define([
 	'modules/grades',
 	'modules/impressum',
 	'modules/options',
-	'modules/people'
-], function($, _, Backbone, BaseRouter, Session, utils, customHistory, HomePageView, NewsView, EventsView, CalendarPageView, MoodlePageView, EmergencyPageView, SitemapPageView, RoomPageView, OpeningPageView, TransportPageView, Transport2PageView, MensaPageView, LibraryPageView, LecturesPageView, GradesPageView, ImpressumPageView, OptionsPageView, PeoplePageView){
+	'modules/people',
+	'modules/tipp'
+], function($, _, Backbone, BaseRouter, Session, utils, customHistory, HomePageView, NewsView, EventsView, CalendarPageView, MoodlePageView, EmergencyPageView, SitemapPageView, RoomPageView, OpeningPageView, TransportPageView, Transport2PageView, MensaPageView, LibraryPageView, LecturesPageView, GradesPageView, ImpressumPageView, OptionsPageView, PeoplePageView, TippPageView){
 
 	var AppRouter = BaseRouter.extend({
 
@@ -57,7 +58,8 @@ define([
 			"grades":"grades",
 			"impressum": "impressum",
 			"options": "options",
-			"people": "people"
+			"people": "people",
+			"tipp": "tipp"
 		},
 
 		routesToScrollPositions: {},
@@ -260,6 +262,10 @@ define([
 
 		people: function(){
 			this.changePage(new PeoplePageView);
+		},
+
+		tipp: function(){
+			this.changePage(new TippPageView);
 		},
 
 		changePage: function(page){
