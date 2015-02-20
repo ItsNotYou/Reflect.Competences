@@ -333,7 +333,7 @@ define([
 			console.warn(error.attributes);
 		});
 
-		info.save();
+//		info.save();
 
 		return true;
 	};

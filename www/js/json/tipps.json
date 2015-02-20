@@ -1,14 +1,113 @@
 [
 	{
-		"name": "Anleitung Webmail",
-		"content": "Platzhalter"
-	},
-	{
+		"id": "0",
 		"name": "Bedeutung Raumnummern",
-		"content": "Platzhalter"
+		"content":[
+			{
+				"title": "Platzhalter"
+			}
+		]
 	},
 	{
+		"id": "1",
 		"name": "Hinweis Mensakarte",
-		"content": "Platzhalter"
+		"content":[
+			{
+				"title": "Platzhalter"
+			}
+		]
+	},
+	{
+		"id": "2",
+		"name": "E-Learning Dienste",
+		"content": [
+			{
+				"title": "Mail.UP - E-Mailserver der Uni Potsdam",
+				"logo": "..",
+				"description":"E-Mails schreiben und Termine verwalten.",
+				"details": [
+					{ 
+						"name": "Infos",
+						"link": "http://www.uni-potsdam.de/mailup/" 
+					},
+					{ 
+						"name": "Login",
+						"link": "https://mailup.uni-potsdam.de/"
+					},
+					{
+						"name": "Einrichtung",
+						"link": {
+							"ios": "http://www.uni-potsdam.de/mailup/thema3/ios.html",
+							"android": "http://www.uni-potsdam.de/mailup/thema3/android.html"
+						}
+					}
+				]
+			},
+			{
+				"title": "Box.UP - Cloud-Speicher der Uni Potsdam",
+				"logo": "..",
+				"description":"Einfach Dateien mit anderen teilen.",
+				"details": [
+					{ 
+						"name": "Infos",
+						"link": "http://www.uni-potsdam.de/boxup/" 
+					},
+					{ 
+						"name": "Login",
+						"link": "https://boxup.uni-potsdam.de/"
+					},
+					{
+						"name": "Einrichtung",
+						"link": {
+							"ios": "https://itunes.apple.com/us/app/owncloud/id543672169?ls=1&mt=8",
+							"android": "https://play.google.com/store/apps/details?id=com.owncloud.android"
+						}
+					}
+				]
+			},
+			{
+				"title": "Pad.UP - Etherpad der Uni Potsdam",
+				"logo": "..",
+				"description":"Der kollaborative Editor auf Basis von Etherpad",
+				"details": [
+					{ 
+						"name": "Login",
+						"link": "https://idp.cs.uni-potsdam.de/idp/Authn/UserPassword"
+					}
+				]
+			},
+			{
+				"title": "Media.UP - Videoportal der Uni Potsdam",
+				"logo": "..",
+				"description":"Videos ansehen",
+				"details": [
+					{ 
+						"name": "zur Seite",
+						"link": "https://mediaup.uni-potsdam.de/" 
+					}
+				]
+			}
+		]
+	},
+	{
+		"id": "3",
+		"name": "Zentrale Einrichtungen",
+		"content":[  
+			{
+				"title": "AVZ"
+			},
+			{
+				"title": "ZEIK"
+			},
+			{
+				"title": "ZFQ"
+			},
+			{
+				"title": "PEP"
+			},
+			{
+				"title": "Bibliothek"
+			}
+		]
 	}
 ]

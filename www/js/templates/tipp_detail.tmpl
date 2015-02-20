@@ -1,7 +1,13 @@
 <h3>
 	<span class="blau"><%= tipp.name %></span><br />
 </h3>
-<div>
-	<p>
-		<%= (tipp.content) ? '<p>'+tipp.content+'</p>' : '' %>
-</div>
+
+<% _.each(tipp.content, function(content){ %>
+	<div>
+		<h3>
+			<div>
+				<span class="black"> <%= content.title %></span>
+			</div>
+		</h3>
+	</div>
+<% }) %>

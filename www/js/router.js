@@ -59,7 +59,8 @@ define([
 			"impressum": "impressum",
 			"options": "options",
 			"people": "people",
-			"tipp": "tipp"
+			"tipp": "tipp",
+			"tipp/*name": "tipp"
 		},
 
 		routesToScrollPositions: {},
@@ -264,8 +265,8 @@ define([
 			this.changePage(new PeoplePageView);
 		},
 
-		tipp: function(){
-			this.changePage(new TippPageView);
+		tipp: function(name){
+			this.changePage(new TippPageView({tippname: name}));
 		},
 
 		changePage: function(page){
