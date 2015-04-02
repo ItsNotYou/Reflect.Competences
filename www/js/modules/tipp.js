@@ -8,31 +8,28 @@ define(['jquery', 'underscore', 'backbone', 'utils'], function($, _, Backbone, u
 	var Tipps = Backbone.Collection.extend({
 		model: Tipp,
 		url: 'js/json/tipps.json',
-		comparator: 'name',
+		comparator: 'name'
 	});
 
 	//Views-------------------------------------------
-	// view for single tipp (details)
+	// view for single tipp in overview
 	var TippView = Backbone.View.extend({
 
 		initialize: function(){
 			_.bindAll(this, 'render');
-			this.template = utils.rendertmpl('tipp_list');
+			this.template = utils.rendertmpl('tipp');
 		},
 
 		render: function(){
-			// console.log(this.template({tipp: this.model.toJSON()}));
 			this.$el.html(this.template({tipp: this.model.toJSON()}));
 			return this;
 		}
 	});
 
-	// view for several tipps (list)
+	// view for several tipps (list) in overview
 	var TippListView = Backbone.View.extend({
-
 		initialize: function(){
 			_.bindAll(this, 'fetchSuccess', 'fetchError', 'render');
-			// this.template = utils.rendertmpl('tipp_list');
 			this.collection = new Tipps();
 			this.collection.fetch({
 				success: this.fetchSuccess,
@@ -50,11 +47,9 @@ define(['jquery', 'underscore', 'backbone', 'utils'], function($, _, Backbone, u
 		},
 
 		render: function(){
-			this.collection.each(function(tipp){
-				var tippView = new TippView({model: tipp});
+			this.collection.each(function(model){
+				var tippView = new TippView({model: model});
 				this.$el.append(tippView.render().$el);
-				// var tippview = this.$el.html(this.template({tipp: tippmodel.toJSON()}));
-				// this.$el.append(this.template({tipp: tippmodel.toJSON()}));
 			}, this);
 
 			this.$el.trigger("create");
@@ -62,49 +57,95 @@ define(['jquery', 'underscore', 'backbone', 'utils'], function($, _, Backbone, u
 		}
 	});
 
-
-	var TippsDetailView = Backbone.View.extend({
-
-	});
-
-
-	//
-	var TippPageView = Backbone.View.extend({
-
-		initialize: function(options) {
-			this.template = utils.rendertmpl('tipp');
-			this.tippname = options.tippname;
-			this.listenTo(this, "renderTippList", this.renderTippList);
-			this.listenTo(this, "renderTippDetails", this.renderTippDetails);
+	// root-view for overview (notwendig weil header nicht mehrmals gerendert werden darf!)
+	var TippOverview = Backbone.View.extend({
+		initialize: function() {
+			this.template = utils.rendertmpl('tippOverview');
 		},
 
 		render: function() {
-			// console.log('render', this.tippname);
-			if(this.tippname){
-				this.renderTippDetails();
-			}else{
-				this.renderTippList();
-			}
-		},
-
-		renderTippList: function(){	
-			// console.log('renderTippList', this.template({}));
 			this.$el.html(this.template({}));
-			
-			var tippList = new TippListView({el: this.$("#tipp-list")});
+			var tippListView = new TippListView({el: this.$("#tipp-list")});
 			this.$el.trigger("create");
 			return this;
-		},
-
-		renderTippDetails: function(){
-			// console.log('renderTippDetails', this.template({}));
-			this.$el.html(this.template({name: this.tippname}));
-
-			var tippDetailView = new TippsDetailView({name: this.tippname});
-			this.$el.trigger("create");
-			return this;		
 		}
 	});
 
-	return TippPageView;
+
+	// view for links to external pages
+	var TippLink = Backbone.View.extend({
+
+		initialize: function(options){
+			_.bindAll(this, 'render');
+			this.template = utils.rendertmpl('tippLink');
+			this.tipplink = options.tipplink;
+			console.log(this.tipplink);
+		},
+
+		render: function(){
+			this.$el.html(this.template({tipplink: this.tipplink}));
+			return this;
+		}
+	});
+
+	// ...
+	var TippContentView = Backbone.View.extend({
+		initialize: function(options) {
+			_.bindAll(this, 'fetchSuccess', 'fetchError', 'render');
+			this.template = utils.rendertmpl('tippContent');
+			this.tippName = options.tippName;
+			this.collection = new Tipps();
+			this.collection.fetch({
+				success: this.fetchSuccess,
+				error: this.fetchError
+			});
+		},
+
+		fetchSuccess: function() {
+			this.render();
+		},
+
+		fetchError: function() {
+			throw new Error('Error loading JSON file');
+		},
+
+		render: function() {
+			var model = this.collection.findWhere({name: this.tippName});
+			_.each(model.attributes.content, function(content){
+				this.$el.append(this.template({content: content}));
+				if(content.links){
+					_.each(content.links, function(link){
+						var tippLink = new TippLink({tipplink: link});
+						// console.log(tippLink.render().$el.html());
+						this.$('#'+content.anchor+'-links').append(tippLink.render().$el.html());
+					}, this);
+				}
+			}, this);
+
+			this.$el.trigger("create");
+			return this;
+			// .....................................<<-
+		}
+	});
+
+	// root-view for detailview
+	var TippDetailview = Backbone.View.extend({
+		initialize: function(options){
+			this.tippName = options.tippName;
+			this.template = utils.rendertmpl('tippDetailview');
+		},
+
+		render: function(){
+			this.$el.html(this.template({name: this.tippName}));
+			var tippContentView = new TippContentView({el: this.$("#tipp-content"), tippName: this.tippName});
+			this.$el.trigger("create");
+			return this;
+		}
+	});
+
+
+	return {
+		TippOverview: TippOverview,
+		TippDetailview: TippDetailview
+	};
 });

@@ -1,19 +1,30 @@
 [
 	{
 		"id": "0",
-		"name": "Bedeutung Raumnummern",
+		"name": "Bedeutung der Raumnummern",
 		"content":[
 			{
-				"title": "Platzhalter"
+				"title": "Platzhalter",
+				"detail": "",
+				"description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
 			}
 		]
 	},
 	{
 		"id": "1",
-		"name": "Hinweis Mensakarte",
+		"name": "Die Potsdamer UniversitätsChipKarte (PUCK)",
 		"content":[
 			{
-				"title": "Platzhalter"
+				"title": "Übersicht aller Funktionen deiner PUCK",
+				"detail": "",
+				"description": "* Studierendenausweis <br>* Semesterticket <br>* Bibliotheksausweis <br>* Kopier- und Druckkarte <br>* Geldbörse für kleine Beträge zur Bezahlung in Mensen, Cafeterien und Bibliotheken",
+				"anchor": "puck",
+				"links": [
+					{ 
+						"name": "weitere Infos",
+						"link": "http://www.uni-potsdam.de/studium/konkret/studienorganisation/puck.html"
+					}
+				]
 			}
 		]
 	},
@@ -22,10 +33,12 @@
 		"name": "E-Learning Dienste",
 		"content": [
 			{
-				"title": "Mail.UP - E-Mailserver der Uni Potsdam",
-				"logo": "..",
-				"description":"E-Mails schreiben und Termine verwalten.",
-				"details": [
+				"logo": "https://boxup.uni-potsdam.de/themes/updropbox/core/img/mailup.png",
+				"title": "Mail.UP",
+				"detail": "Der E-Mailserver der Uni Potsdam",
+				"description": "Schreibe E-Mails und verwalte deine Termine.",
+				"anchor": "mail",
+				"links": [
 					{ 
 						"name": "Infos",
 						"link": "http://www.uni-potsdam.de/mailup/" 
@@ -44,10 +57,12 @@
 				]
 			},
 			{
-				"title": "Box.UP - Cloud-Speicher der Uni Potsdam",
-				"logo": "..",
-				"description":"Einfach Dateien mit anderen teilen.",
-				"details": [
+				"logo": "https://boxup.uni-potsdam.de/themes/updropbox/core/img/boxup.png",
+				"title": "Box.UP",
+				"detail": "Der Cloud-Speicher der Uni Potsdam",
+				"description": "Hier stehen Dir 30 GB Speicher zur Verfügung. <br>Greife von all deinen Geräten auf deine Dateien zu, verwalte sie und teile sie einfach und sicher mit anderen.",
+				"anchor": "box",
+				"links": [
 					{ 
 						"name": "Infos",
 						"link": "http://www.uni-potsdam.de/boxup/" 
@@ -66,10 +81,12 @@
 				]
 			},
 			{
-				"title": "Pad.UP - Etherpad der Uni Potsdam",
-				"logo": "..",
-				"description":"Der kollaborative Editor auf Basis von Etherpad",
-				"details": [
+				"logo": "https://boxup.uni-potsdam.de/themes/updropbox/core/img/padup.png",
+				"title": "Pad.UP",
+				"detail": "Das Etherpad der Uni Potsdam",
+				"description": "Nutze den kollaborativen Editor um gemeinsam mit Kommilitoninnen und Kommilitonen Dateien zu bearbeiten",
+				"anchor": "pad",
+				"links": [
 					{ 
 						"name": "Login",
 						"link": "https://idp.cs.uni-potsdam.de/idp/Authn/UserPassword"
@@ -77,10 +94,12 @@
 				]
 			},
 			{
-				"title": "Media.UP - Videoportal der Uni Potsdam",
-				"logo": "..",
-				"description":"Videos ansehen",
-				"details": [
+				"logo": "https://boxup.uni-potsdam.de/themes/updropbox/core/img/mediaup.png",
+				"title": "Media.UP",
+				"detail": "Das Videoportal der Uni Potsdam",
+				"description": "Schaue dir von überall aus Videos an",
+				"anchor": "media",
+				"links": [
 					{ 
 						"name": "zur Seite",
 						"link": "https://mediaup.uni-potsdam.de/" 
@@ -94,19 +113,29 @@
 		"name": "Zentrale Einrichtungen",
 		"content":[  
 			{
-				"title": "AVZ"
+				"title": "AVZ",
+				"detail": "blub",
+				"description": "bla"
 			},
 			{
-				"title": "ZEIK"
+				"title": "ZEIK",
+				"detail": "blub",
+				"description": "bla"
 			},
 			{
-				"title": "ZFQ"
+				"title": "ZFQ",
+				"detail": "blub",
+				"description": "bla"
 			},
 			{
-				"title": "PEP"
+				"title": "PEP",
+				"detail": "blub",
+				"description": "bla"
 			},
 			{
-				"title": "Bibliothek"
+				"title": "Bibliothek",
+				"detail": "blub",
+				"description": "bla"
 			}
 		]
 	}
