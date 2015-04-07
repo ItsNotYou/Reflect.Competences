@@ -1,36 +1,5 @@
-<!-- Start Header -->
-<div data-role="header" data-position="fixed" data-tap-toggle="false">
-  <% if(!name){ %>
-    <a href="#" data-role="button" data-icon="false" data-inline="true" data-transition="slidefade" data-direction="reverse" class="menubutton ui-btn ui-btn-inline ui-link ui-shadow ui-corner-all">Menue</a>
-    <%  if(store.get('up.session.authenticated')){ %>
-      <h1 class="loggedin">Tipps&Tricks</h1>
-      <a href="#options" class="settings ui-btn" data-role="button" data-icon="false" title="logout" alt="logout">Logout</a>
-    <% }else{ %>
-      <h1> Tipps&Tricks </h1> 
-    <% } %>
-
-  <%  } else  { %> 
-    <a href="#tipp" class="ui-btn ui-btn-inline ui-link ui-shadow ui-corner-all back" data-transition="slidefade" data-direction="reverse" data-rel="back">Zurück</a>
-      <%  if(store.get('up.session.authenticated')){ %>
-      <h1 class="loggedin"><%= name %></h1>
-      <a href="#options" class="settings ui-btn" data-role="button" data-icon="false" title="logout" alt="logout">Logout</a>
-    <% }else{ %>
-      <h1> <%= name %> </h1> 
-    <% } %>
-  <% } %>
-      
-</div>
-<!-- End Header -->
-
-<!-- Start Main - Navigation -->
-<div>
-  <ul id="tipp-list" data-role="listview"></ul>
-
-  <!-- <form>
-    <input data-type="search" id="searchForTipp" placeholder="Eintr&auml;ge filtern" />
-  </form>
-
-  <div id="tipp-list" data-role="collapsible-set" data-theme="c" data-collapsed="false" data-iconpos="right" data-collapsed-icon="arrow-down" data-expanded-icon="arrow-up" data-filter="true" data-input="#searchForTipp">
-  </div> -->
-
-</div>
+<li class='blau'  id='<%= tipp.name %>'><h3>
+  	<a href="#tipp/<% print(encodeURIComponent(tipp.name)); %>" data-role="button" data-iconpos="right" data-icon="arrow-darkblue" data-transition="slidefade">
+    	<%= tipp.name %>
+  	</a></h3>
+</li>
