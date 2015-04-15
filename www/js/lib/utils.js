@@ -17,7 +17,7 @@ define([
 	    	rendertmpl.tmpl_cache = {};
 	    }
 
-		    if ( ! rendertmpl.tmpl_cache[tmpl_name] ) {
+		if ( ! rendertmpl.tmpl_cache[tmpl_name] ) {
 	        var tmpl_dir = 'js/templates';
 	        var tmpl_url = tmpl_dir + '/' + tmpl_name + '.tmpl';
 		        var tmpl_string;
@@ -44,6 +44,32 @@ define([
 	    	}
 	    	return templateFunction(params);
 	    };
+	};
+	
+	var renderheader = function(d){
+		if ( !renderheader.headerTemplateLoaded ) {
+			var tmpl_dir = 'js/templates';
+			var tmpl_url = tmpl_dir + '/header.tmpl';
+			var tmpl_string;
+
+			$.ajax({
+				url: tmpl_url,
+				method: 'GET',
+				dataType: 'html',
+				async: false, //Synchron, also eigentlich nicht AJAX- sondern SJAX-Call
+				success: function(data) {
+					tmpl_string = data;
+				}
+			});
+
+			renderheader.headerTemplateString = tmpl_string.replace(/\t/g, '');
+			renderheader.headerTemplateLoaded = true;
+		}
+		d.settingsUrl = d.settingsUrl ? d.settingsUrl : false;
+		d.back = d.back ? d.back : false;
+		d.title = d.title ? d.title : '';
+		d.store = LocalStore;
+		return _.template(renderheader.headerTemplateString, d);
 	};
 
 	var removeTabs = function(tmpl) {
@@ -435,6 +461,7 @@ define([
 
 	return {
 			rendertmpl: rendertmpl,
+			renderheader: renderheader,
 			removeTabs: removeTabs,
 			addLoadingSpinner: addLoadingSpinner,
 			removeLoadingSpinner: removeLoadingSpinner,

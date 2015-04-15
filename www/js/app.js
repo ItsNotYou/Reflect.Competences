@@ -179,13 +179,15 @@ define([
 			* @view: View Url
 			* @d: Daten Objekt (vom Server)
 			*/
-			render : function(view, d){
+			render: function(view, d){
 				var temp = this.template(view); //Template-String aus dem DOM holen
 				if(d && d.vars)
 					d = d.vars;
 				//var temp = _.template(t); //Underscore-Template laden
 				return temp(d); //Template mit Daten parsen und zurückgeben
 			},
+			
+			
 			/*
 			* Wenn nötig Daten vom Server laden, Seite rendern und Seitenübergang vollführen
 			* @c: Controllername
@@ -210,16 +212,21 @@ define([
 				page.render();
 				console.log(utils.capitalize(c) + utils.capitalize(a));
 
-				var d = {}, response = {};
+				var d = {};
+				var response = {};
 			
 				/*$('body').css('overflow', 'hidden');
 				$('#nav-panel').css('display', 'none');*/
 				
-				var header = page.$("[data-role=header]").detach().toolbar();
-				header.addClass('ui-page-theme-a');
 				var pageContent = page.$el.attr("data-role", "page");
-				$('#pagecontainer').append(pageContent);
-				$('#pagecontainer').prepend(header);
+				var pageTitle = pageContent.find('meta[name="title"]').attr('content');
+
+				var header = utils.renderheader({title:pageTitle});
+				
+				pageContent.css('padding-top', '54px'); 
+				$pageContainer = $('#pagecontainer');
+				$pageContainer.append(pageContent);
+				$pageContainer.append(header);
 				var transition = $.mobile.changePage.defaults.transition;
 				var reverse = $.mobile.changePage.defaults.reverse;
 				
@@ -233,6 +240,7 @@ define([
 				}
 				var content = false;
 				if(!app.data[c]) app.data[c] = {};
+				
 				var success = function(s, d){
 					console.log(d);
 					if(content) {
@@ -282,6 +290,18 @@ define([
 							console.log(app.cache);
 						}
 						content.render();
+						var $metas = content.$el.find('meta'); //Meta infos aus Seite in den Header integrieren
+						if($metas.length > 0){
+							var metas = {};
+							$metas.each(function(){
+								metas[$(this).attr('name')] = $(this).attr('content');
+							});
+							if(!metas.title) 
+								metas.title = pageTitle;
+							var header = utils.renderheader(metas);
+							//alert(header);
+							$pageContainer.find('.ui-header').replaceWith(header);
+						}
 					}
 					console.log(page.el);
 					Q($.mobile.changePage(pageContent, {changeHash: false, transition: transition, reverse: reverse})).done(function(){
@@ -291,14 +311,17 @@ define([
 							$("body").fadeIn(100);
 						}
 						this.currentView = page;
-						q.resolve(d, content);
+						if(_.keys(response).length > 0)
+							q.resolve(response, content);
+						else
+							q.resolve(d, content);
 					});
 				}
 				
 				if(app.views[utils.capitalize(c) + utils.capitalize(a)]) { //Wenn eine View-Klasse für Content vorhanden ist: ausführen
 					content = new app.views[utils.capitalize(c) + utils.capitalize(a)](params);
 					content.page = $(page.el);
-					if((content.model || content.collection) && content.inCollection) { //Element aus der geladener Collection holen und nicht vom Server
+					if((content.model || content.collection) && content.inCollection) { //Element aus der geladenen Collection holen und nicht vom Server
 						var parts = content.inCollection.split('.');
 						try {
 							var list = eval('app.data.' + content.inCollection);
@@ -424,6 +447,7 @@ define([
 					callback(url);
 				return q.promise;*/
 			},
+			
 			/*
 			* Daten vom Server laden
 			* @zu ladende URL
@@ -431,7 +455,6 @@ define([
 			get: function(url){
 				var q = Q.defer();
 				if(app.requests[url] && !this.refreshing && app.cacheTimes[url] && Date.now() - app.cacheTimes[url] < 5 * 3600000) { //Alle 5 Stunden wird aktualisiert, sonst aus dem Cache holen, wenn vorhanden
-					track(url);
 					q.resolve(app.requests[url]);
 				} else {
 					$.getJSON(this.jsonUrl + url).done(function(d){ app.requests[url] = d; app.cacheTimes[url] = Date.now(); q.resolve(d);}); //Url anfragen
@@ -466,7 +489,8 @@ define([
 				var height = this.body.height() - hheight - fheight - this.contentOuter + 3;
 				this.layoutCSS.html('.ui-content{height:'+height+'px !important;} .app-page{padding-top:'+(hheight - 1)+'px !important;}'); //Seiteninhaltscontainergröße festlegen
 			},
-			/*
+			
+			/**
 			* Globale Events setzen
 			*/
 			bindEvents:function(){

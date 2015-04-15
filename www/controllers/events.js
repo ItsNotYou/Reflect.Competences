@@ -32,13 +32,15 @@ app.controllers.events = BackboneMVC.Controller.extend({
     index:function(filter){
 		var self = this;
 		this.filter = filter;
-		app.loadPage(this.name, 'index', {going:this.going}).done(function(d, view){
-			//console.log(d);
+		app.loadPage(this.name, 'index', {filter:this.filter, going:this.going}).done(function(d, view){
+			console.log(d);
 			if(!d) return;
+			
 			self.events = d.events;
 			self.places = d.places; //places-liste lokal speichern
 			//self.filterIndex(); //Events filtern nach locations und gewählter Zeitraum
 			//self.setActiveBtn(); //Aktiven Button markieren im Footer
+			console.log(self.places);
 		});
     },
 	
@@ -55,7 +57,9 @@ app.controllers.events = BackboneMVC.Controller.extend({
 	* Locations auswählen
 	*/
 	set_locations: function(){
-		if(this.places) { //Wenn die Locations schon lokal vorhanden sind Seite anzeigen
+		//console.log(this.places);
+		if(this.places) { //Wenn die Locations schon lokal vorhanden sind, Seite anzeigen
+			alert(3);
 			app.loadPage(this.name, 'set_locations', {places:this.places, disabledLocations:this.disabledLocations}).done(function(){
 				
 			});
@@ -129,15 +133,6 @@ app.controllers.events = BackboneMVC.Controller.extend({
 				self.disabledLocations[$(el).data('id')] = $(el).data('id');
 		});
 		LocalStore.set('disabledLocations', this.disabledLocations);
-	},
-	
-	/*
-	* Aktiven Button im Footer der Eventliste anhand des aktuellen filters markieren
-	*/
-	setActiveBtn:function(){
-		var klasse = 'ui-btn-active';
-		$('.btn-filter-events.'+klasse).removeClass(klasse);
-		$('#btn-'+this.filter+'-events', app.footer).addClass(klasse);
 	},
 	
 	

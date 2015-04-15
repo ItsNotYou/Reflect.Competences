@@ -65,7 +65,6 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'date'], function($, _, Bac
 
 		render:function(){
 			this.undelegateEvents();
-
 			var vars = this.model.toJSON();
 			if(!vars.event)
 				vars.event = vars;
@@ -81,7 +80,7 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'date'], function($, _, Bac
 			return this;
 		},
 
-		/*
+		/**
 		* Das aktuell angezeigte Event im Kalender speichern
 		*/
 		saveToCalendar:function(){
@@ -149,6 +148,7 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'date'], function($, _, Bac
 		el: '#events',
 
 		initialize: function(p){
+			alert('FF');
 			this.template = utils.rendertmpl('events.set_locations');
 			this.page  = p.page;
 			_.bindAll(this, 'render', 'toggleLocation');
@@ -157,6 +157,7 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'date'], function($, _, Bac
 
 		render:function(){
 			this.$el = this.page.find('#events');
+			console.log(app.data);
 			this.$el.html(this.template({places: app.data.places, disabledLocations: utils.LocalStore.get('disabledLocations', {})}));
 			$('.ch-location').change(this.toggleLocation);
 			this.$el.trigger("create");
@@ -187,15 +188,16 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'date'], function($, _, Bac
 			this.page = p.page;
 			this.filter = p.filter;
 			_.bindAll(this, 'render', 'filterIndex');
+			//alert('fetch');
 			//this.going = utils.LocalStore.get('going', {}); //Liste der vorgemerkten Events laden
 	   		//this.disabledLocations = utils.LocalStore.get('disabledLocations', {});
-			this.collection.fetch({
+			/*this.collection.fetch({
 				success: this.render,
 				error: function(){
 					var errorPage = new utils.ErrorView({el: '#events', msg: 'Die Veranstaltungen konnten nicht abgerufen werden.', module: 'events'});
 				},
 				dataType: 'json' 
-			});
+			});*/
 		},
 
 		fetchError: function(){
@@ -203,12 +205,14 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'date'], function($, _, Bac
 		},
 
 		render: function(){
+			//alert('render');
 			app.data.places = this.collection.response.places;
 			this.$el = this.page.find('#events');
 			this.$el.html(this.template({events: this.collection.toJSON(), date:date, going:utils.LocalStore.get('going', {})}));
 			var self = this;
 			$('.btn-filter-events').click(function(e){
 				e.preventDefault();
+				e.stopPropagation();
 				self.filterIndex($(this).data('filter'));
 			});
 			this.filterIndex(this.filter);
@@ -234,8 +238,17 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'date'], function($, _, Bac
 			$('#eventlist').trigger('resize');
 			this.filter = w;
 			Backbone.history.navigate('events/index/'+this.filter, { trigger : false });
-			//this.setActiveBtn();
+			this.setActiveBtn();
 			window.setTimeout(function(){$(window).trigger('resize');}, 10);
+		},
+		
+		/*
+		* Aktiven Button im Footer der Eventliste anhand des aktuellen filters markieren
+		*/
+		setActiveBtn:function(){
+			var klasse = 'ui-btn-active';
+			$('.btn-filter-events.'+klasse).removeClass(klasse);
+			$('#btn-'+this.filter+'-events').addClass(klasse);
 		}
 	});
 
