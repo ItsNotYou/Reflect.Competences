@@ -129,18 +129,14 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'date'], function($, _, Bac
 	});
 
 	app.views.EventsSet_locations = Backbone.View.extend({
-		el: '#events',
-
+	
 		initialize: function(p){
 			this.template = utils.rendertmpl('events.set_locations');
-			this.page  = p.page;
 			_.bindAll(this, 'render', 'toggleLocation');
-			window.setTimeout(this.render, 10); //Strange hack so that this.$el is found
 		},
 
 		render:function(){
 			this.$el = this.page.find('#events');
-			console.log(app.data);
 			this.$el.html(this.template({places: app.data.places, disabledLocations: utils.LocalStore.get('disabledLocations', {})}));
 			$('.ch-location').change(this.toggleLocation);
 			this.$el.trigger("create");
@@ -164,11 +160,10 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'date'], function($, _, Bac
 	});
 
 	app.views.EventsIndex = Backbone.View.extend({
-		el: '#events',
 		initialize: function(p){
 			this.template = utils.rendertmpl('events.index');
 			this.collection = new app.models.Events(p);
-			this.page = p.page;
+			console.log(p);
 			this.filter = p.filter;
 			_.bindAll(this, 'render', 'filterIndex');
 		},
@@ -243,5 +238,3 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'date'], function($, _, Bac
 	return app.views;
 
 });
-
-//going[id] marker in template missing

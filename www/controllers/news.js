@@ -35,9 +35,8 @@ app.controllers.news = BackboneMVC.Controller.extend({
     index:function(){
 		var self = this;
 		app.loadPage(this.name, 'index', {}, 'slide').done(function(d){
-			//self.newsSources = d.vars.newsSources; //Newsquellen lokal speichern
-			//self.filterIndex(); //Nur gewählte Quellen anzeigen
-			//self.addPullToRefresh();  //Pull-To-Refresh hinzufügen
+			console.log(d);
+			self.newsSources = d.newsSources; //Newsquellen lokal speichern
 		});
     },
 	
@@ -47,7 +46,6 @@ app.controllers.news = BackboneMVC.Controller.extend({
 	set_sources: function(){
 		if(this.newsSources) { //Wenn Quellen vom Server geladen wurden, zur Seite wecheln
 			app.loadPage(this.name, 'set_sources', {newsSources:this.newsSources});
-			track('news/set_sources/');
 		} else { //Sonst zu news/index gehen
 			app.route('news/index');
 		}
@@ -57,7 +55,6 @@ app.controllers.news = BackboneMVC.Controller.extend({
 	* Newsliste einer Quelle
 	*/
 	source: function(id){
-		alert(1);
 		app.loadPage(this.name, 'source', {id:id}).done(function(){
 			
 		});

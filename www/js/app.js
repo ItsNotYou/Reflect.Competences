@@ -339,7 +339,7 @@ define([
 				if(app.views[utils.capitalize(c) + utils.capitalize(a)]) { //Wenn eine View-Klasse für Content vorhanden ist: ausführen
 					content = new app.views[utils.capitalize(c) + utils.capitalize(a)](params);
 					content.page = $(page.el);
-					//console.log(content);
+					console.log($(page.el));
 					if((content.model || content.collection) && content.inCollection) { //Element aus der geladenen Collection holen und nicht vom Server
 						var parts = content.inCollection.split('.');
 						//console.log(app.data);

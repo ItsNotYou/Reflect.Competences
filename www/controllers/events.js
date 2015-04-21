@@ -33,9 +33,7 @@ app.controllers.events = BackboneMVC.Controller.extend({
 		var self = this;
 		this.filter = filter;
 		app.loadPage(this.name, 'index', {filter:this.filter, going:this.going}).done(function(d, view){
-			console.log(d);
 			if(!d) return;
-			
 			self.events = d.events;
 			self.places = d.places; //places-liste lokal speichern
 			//self.filterIndex(); //Events filtern nach locations und gewählter Zeitraum
