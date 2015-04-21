@@ -40,6 +40,9 @@ body,.ui-page {
 	height: 55px;
 	padding: 0;
 }
+.ui-page-header-fixed { /*Platz der Seite nach oben für den Header*/
+	padding-top:55px !important;
+}
 
 p {
 	margin: 0;
@@ -373,14 +376,14 @@ label.showfirst {
 /*login - logout
 -------------------- */
 .ui-icon-login:after {
-	background-image: url(../img/up/login.svg);
+	background-image: url(../img/up/login.png);
 	background-color: #fff !important;
 	top: 25%;
 	left: .1em !important;
 }
 
 .ui-icon-logout:after {
-	background-image: url(../img/up/logout.svg);
+	background-image: url(../img/up/logout.png);
 	background-color: #fff !important;
 	top: 25%;
 	left: .1em !important;
@@ -630,7 +633,7 @@ label.showfirst {
 }
 
 .ui-page-theme-a .ui-btn.settings:before {
-	background-image: url(../img/up/logout.svg);
+	background-image: url(../img/up/logout.png);
 	background-repeat: no-repeat;
 	content: ".";
 	display: inline-block;

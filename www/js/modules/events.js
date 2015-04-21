@@ -233,8 +233,9 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'date'], function($, _, Bac
 		},
 
 		render: function(){
-			$(this.el).html(this.template({}));
-			$(this.el).trigger("create");
+			var $el = $(this.el); 
+			$el.html(this.template({}));
+			$el.trigger("create");
 			return this;
 		}
 	});

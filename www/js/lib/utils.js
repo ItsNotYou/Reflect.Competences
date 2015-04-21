@@ -70,6 +70,7 @@ define([
 		d.backCaption = d.backCaption ? d.backCaption : false;
 		d.title = d.title ? d.title : '';
 		d.klass = d.klass ? ' ' + d.klass : '';
+		d.home = d.home ? d.home : false;
 		d.store = LocalStore;
 		return _.template(renderheader.headerTemplateString, d);
 	};

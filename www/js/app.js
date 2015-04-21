@@ -225,8 +225,13 @@ define([
 				
 				pageContent.css('padding-top', '54px'); 
 				$pageContainer = $('#pagecontainer');
+				var $header = $pageContainer.find('.ui-header');
 				$pageContainer.append(pageContent);
-				$pageContainer.append(header);
+				if($header.length > 0) {
+					$header.replaceWith(header);
+				} else {
+					$pageContainer.append(header);
+				}
 				var transition = $.mobile.changePage.defaults.transition;
 				var reverse = $.mobile.changePage.defaults.reverse;
 				
@@ -297,6 +302,7 @@ define([
 						}
 						content.render();
 						var $metas = content.$el.find('meta'); //Meta infos aus Seite in den Header integrieren
+						
 						if($metas.length > 0){
 							var metas = {};
 							$metas.each(function(){
@@ -307,6 +313,10 @@ define([
 							var header = utils.renderheader(metas);
 							//alert(header);
 							$pageContainer.find('.ui-header').replaceWith(header);
+							$footer = $pageContainer.find('.ui-footer');
+							if($footer.length > 0) {
+								pageContent.addClass('ui-page-footer-fixed');
+							}
 						}
 					}
 					//console.log(page.el);
