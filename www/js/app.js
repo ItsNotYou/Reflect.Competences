@@ -23,7 +23,7 @@ define([
 		app = {
 			c: {}, //Controller-Objekte werden in diesem Array abgelegt
 			controllers: {}, //Controllerklassen
-			controllerList: ["controllers/main", "controllers/events", "controllers/news", "controllers/opening"], //In der app vorhandene Controller
+			controllerList: ["controllers/main", "controllers/events", "controllers/news", "controllers/opening", "controllers/sitemap"], //In der app vorhandene Controller
 			viewType:"text/x-underscore-template", //Templateenginekennung (Underscore)
 			requests : [], //Speichert die Rückgabe für jede URL (Cache)
 			cacheTimes: [], //Speichert für jede URL die letzte Zeit, wann diese vom Server geladen wurde
@@ -203,7 +203,7 @@ define([
 					$('#pagecontainer').children().first().remove();
 				}*/
 				
-				
+				console.log(app.views);
 				var page = new app.views[utils.capitalize(c) + 'Page'];
 				//console.log(page.el);
 				// prepare new view for DOM display
@@ -339,7 +339,8 @@ define([
 				
 				console.log(app.views);
 				if(app.views[utils.capitalize(c) + utils.capitalize(a)]) { //Wenn eine View-Klasse für Content vorhanden ist: ausführen
-					content = new app.views[utils.capitalize(c) + utils.capitalize(a)](params);
+					app.currentView = {};
+					app.currentView = content = new app.views[utils.capitalize(c) + utils.capitalize(a)](params);
 					content.page = $(page.el);
 					console.log($(page.el));
 			
@@ -573,19 +574,20 @@ define([
 				});
 		
 				$(document).on('click', 'a', function(e){ //Alle Link-Klicks abfangen für internes Backbone-Routing
-					var href = $(this).attr('href') || '';
-					var target = $(this).attr('target');
+					var $this = $(this);
+					var href = $this.attr('href') || '';
+					var rel = $this.attr('rel') || false;
+					var target = $this.attr('target');
 					var mapRequest = !(href.indexOf('maps:') == -1 && href.indexOf('geo:') == -1);
-					if(href && href.indexOf('javascript:') == -1 && href.indexOf('http://') == -1 && !mapRequest) {
+					if(href && href != '#' && href.indexOf('javascript:') == -1 && href.indexOf('http://') == -1 && href.indexOf('https://') == -1 && !mapRequest && rel != 'norout') {
 						$('.ui-btn-active', app.activePage()).removeClass('ui-btn-active');
-						$(this).addClass('ui-btn-active');
+						$this.addClass('ui-btn-active');
 						self.route(href);
 					}
 					if(!target || target != '_system') {
 						e.preventDefault();
 					} else {
-						if(href)
-							track(href);
+
 					}
 				})
 			},

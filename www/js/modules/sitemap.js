@@ -93,7 +93,7 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'q', 'modules/campusmenu', 
 				oneSidedGuard.disableBlock();
 			}});
 		}).fail(function(){
-			var errorPage = new utils.ErrorView({el: '#error-placeholder', msg: 'Es ist ein Fehler aufgetreten wahrscheinlich besteht keine Internetverbindung.', module:'sitemap'});
+			var errorPage = new utils.ErrorView({el: '#error-placeholder', msg: 'Es ist ein Fehler aufgetreten. Wahrscheinlich besteht keine Internetverbindung.', module:'sitemap'});
 		});
 	});
 
@@ -270,14 +270,14 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'q', 'modules/campusmenu', 
 		var host = $("#" + lastFinderId);
 		host.empty();
 		host.append("<ul id='similarlocations' data-role='listview' data-icon='arrow-darkblue' style='padding-left:16px; margin-bottom:5px;margin-top:5px;'></ul>");
-		host.append("<button data-theme='a' onclick='require([\"modules/sitemap\"], function(Sitemap) { new Sitemap().sitemapReset(); });'>Zurück</button>");
+		host.append("<button data-theme='a' onclick='app.currentView.sitemapReset();'>Zurück</button>");
 		host.trigger("create");
 
 		var similars = similarHouses.concat(similarDescriptions);
 		similars = _.uniq(similars, false, function(item) { return item.data; });
 
 		_.each(similars, function(item) {
-			$("#similarlocations").append("<li><a onclick='require([\"modules/sitemap\"], function(Sitemap) { new Sitemap().sitemapNavigateTo(\"" + item.geo.properties.id + "\"); });'>" + item.geo.properties.Name + " (" + item.campus + ")</a></li>");
+			$("#similarlocations").append("<li><a onclick='app.currentView.sitemapNavigateTo(\"" + item.geo.properties.id + "\");'>" + item.geo.properties.Name + " (" + item.campus + ")</a></li>");
 		});
 
 		$("#similarlocations").listview("refresh");
@@ -426,16 +426,16 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'q', 'modules/campusmenu', 
 	});
 
 	var geo = new SearchableGeoCollection();
-
-	var SitemapPageView = Backbone.View.extend({
-		attributes: {"id": 'sitemap'},
+	
+	app.views.SitemapIndex = Backbone.View.extend({
 
 		initialize: function(){
 			this.template = utils.rendertmpl('sitemap');
 		},
 
 		render: function(){
-			$(this.el).html(this.template({}));
+			this.$el = this.page;
+			this.$el.html(this.template({}));
 			return this;
 		},
 
@@ -452,5 +452,18 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'q', 'modules/campusmenu', 
 		}
 	});
 
-	return SitemapPageView;
+
+	app.views.SitemapPage = Backbone.View.extend({
+		attributes: {"id": 'sitemap'},
+
+		initialize: function(){
+		},
+
+		render: function(){
+			$(this.el).html('');
+			return this;
+		}
+	});
+
+	return app.views; //SitemapPageView;
 });

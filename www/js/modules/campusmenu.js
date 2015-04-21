@@ -10,9 +10,9 @@ define(['jquery', 'underscore', 'backbone', 'jquerymobile'], function($, _, Back
 			this.element.append(
 				"<div data-role='navbar'> \
                     <ul> \
-                        <li><a href='#griebnitzsee' class='location-menu location-menu-default'>Griebnitzsee</a></li> \
-                        <li><a href='#neuespalais' class='location-menu'>Neues Palais</a></li> \
-                        <li><a href='#golm' class='location-menu'>Golm</a></li> \
+                        <li><a rel='norout' href='#sitemap/index/griebnitzsee' class='location-menu location-menu-default'>Griebnitzsee</a></li> \
+                        <li><a rel='norout' href='#sitemap/index/neuespalais' class='location-menu'>Neues Palais</a></li> \
+                        <li><a rel='norout' href='#sitemap/index/golm' class='location-menu'>Golm</a></li> \
                     </ul> \
                 </div>");
 			this.element.trigger("create");
@@ -57,7 +57,9 @@ define(['jquery', 'underscore', 'backbone', 'jquerymobile'], function($, _, Back
 		},
 
 		_retrieveSelection: function(selectionSource) {
-			return selectionSource.attr("href").slice(1);
+			var s = selectionSource.attr("href").slice(1);
+			s = s.substr(s.lastIndexOf('/') + 1);
+			return s;
 		},
 
 		_activateDefaultSelection: function() {
@@ -70,7 +72,7 @@ define(['jquery', 'underscore', 'backbone', 'jquerymobile'], function($, _, Back
 			}
 
 			$(".location-menu", this.element).removeClass("ui-btn-active");
-			var searchExpression = "a[href='#" + defaultSelection + "']";
+			var searchExpression = "a[href*='" + defaultSelection + "']";
 			$(searchExpression).addClass("ui-btn-active");
 
 			return defaultSelection;
@@ -90,7 +92,7 @@ define(['jquery', 'underscore', 'backbone', 'jquerymobile'], function($, _, Back
 			var target = campusName;
 
 			$(".location-menu", this.element).removeClass("ui-btn-active");
-			var searchExpression = "a[href='#" + target + "']";
+			var searchExpression = "a[href*='/" + target + "']";
 			$(searchExpression).addClass("ui-btn-active");
 
 			// prepare call options

@@ -1,3 +1,6 @@
+<meta name="title" content="Lagepläne" />
+<meta name="settingsUrl" content="sitemaps-settings" />
+
 <div data-role="panel" style="background-color:#ededed;" data-position="right" data-display="overlay" id="sitemaps-settings" data-theme="b" data-dismissible="false">
 	<fieldset data-role="controlgroup">
 		<h3 class="blau">Folgende Orte anzeigen:</h3>
@@ -14,22 +17,8 @@
 		<input type="checkbox" name="Studentenwohnheime" id="Living" checked="true">
 		<label for="Living" class="sitemap-living">Studentenwohnheime</label>
 	</fieldset>
-	<a href="#header" data-role="button" data-theme="a" data-rel="close" class="options-close">Schlie&szlig;en</a>
+	<a href="#" data-role="button" data-theme="a" data-rel="close" class="options-close">Schlie&szlig;en</a>
 </div>
-<!-- Start Header -->
-<div data-role="header" data-position="fixed" data-tap-toggle="false">
-	<a href="#" data-role="button" data-icon="false" data-inline="true" data-transition="slidefade" data-direction="reverse" class="menubutton ui-btn ui-btn-inline ui-link ui-shadow ui-corner-all">Menue</a>
-	    
-    <%  if(store.get('up.session.authenticated')){ %>
-	<h1 class="loggedin">Lagepl&auml;ne </h1>
-	<a href="#options" class="settings ui-btn" data-role="button" data-icon="false" title="logout" alt="logout">Logout</a>
-    <%  } else { %> 
-    <h1>Lagepl&auml;ne </h1>   
-    <% } %> 
-    
-    <a data-icon="star" data-role="button" class="settings" href="#sitemaps-settings" role="button" title="settings" alt="settings"></a>
-</div>
-<!-- End Header -->
 <!-- Start Main - Navigation -->
 <div data-role="content" data-theme="c">
 	<div data-role="campusmenu" data-store="up.mensa.default"></div>
