@@ -30,7 +30,7 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'date'], function($, _, Bac
 
 	app.models.Place = Backbone.Collection.extend({
 		model: app.models.Event,
-		url: 'https/://musang.soft.cs.uni-potsdam.de/potsdamevents/json/events/place/',
+		url: 'https://musang.soft.cs.uni-potsdam.de/potsdamevents/json/events/place/',
 
 		initialize: function(p){
 			this.url = this.url + p.id;
@@ -54,13 +54,10 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'date'], function($, _, Bac
 			_.bindAll(this, 'render');
 			this.page = p.page;
 			this.model = new app.models.Event(p);
-			this.model.fetch({
-				success: this.render,
-				error: function(){
-					var errorPage = new utils.ErrorView({el: '#events', msg: 'Die Veranstaltung konnte nicht abgerufen werden.', module: 'events'});
-				},
-				dataType: 'json'
-			});
+		},
+		
+		fetchError: function(){
+			var errorPage = new utils.ErrorView({el: '#events', msg: 'Die Veranstaltung konnte nicht abgerufen werden.', module: 'events'});
 		},
 
 		render:function(){
@@ -113,28 +110,15 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'date'], function($, _, Bac
 			this.page = p.page;
 			this.filter = p.filter;
 			app.data.events = p.events;
-
 			_.bindAll(this, 'render');
-			//this.going = utils.LocalStore.get('going', {}); //Liste der vorgemerkten Events laden
-	   		//this.disabledLocations = utils.LocalStore.get('disabledLocations', {});
-			if(!app.data.events)
-				this.collection.fetch({
-					success: this.render,
-					error: function(){
-						var errorPage = new utils.ErrorView({el: '#events', msg: 'Die Veranstaltungen konnten nicht abgerufen werden.', module: 'events'});
-					},
-					dataType: 'json' });
-			else
-				this.render();
 		},
-
+		
 		fetchError: function(){
-			throw new Error('Error loading JSON file');
+			var errorPage = new utils.ErrorView({el: '#events', msg: 'Die Veranstaltungen konnten nicht abgerufen werden.', module: 'events'});
 		},
 
 		render: function(){
 			this.$el = this.page.find('#events');
-			console.log(this.$el);
 			this.$el.html(this.template({events: this.collection.toJSON(), date:date, going:utils.LocalStore.get('going', {})}));
 			var self = this;
 			this.$el.trigger("create");
@@ -148,7 +132,6 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'date'], function($, _, Bac
 		el: '#events',
 
 		initialize: function(p){
-			alert('FF');
 			this.template = utils.rendertmpl('events.set_locations');
 			this.page  = p.page;
 			_.bindAll(this, 'render', 'toggleLocation');
@@ -165,7 +148,7 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'date'], function($, _, Bac
 			return this;
 		},
 
-		/*
+		/**
 		* Locations toggeln
 		*/
 		toggleLocation: function(it){
@@ -188,16 +171,6 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'date'], function($, _, Bac
 			this.page = p.page;
 			this.filter = p.filter;
 			_.bindAll(this, 'render', 'filterIndex');
-			//alert('fetch');
-			//this.going = utils.LocalStore.get('going', {}); //Liste der vorgemerkten Events laden
-	   		//this.disabledLocations = utils.LocalStore.get('disabledLocations', {});
-			/*this.collection.fetch({
-				success: this.render,
-				error: function(){
-					var errorPage = new utils.ErrorView({el: '#events', msg: 'Die Veranstaltungen konnten nicht abgerufen werden.', module: 'events'});
-				},
-				dataType: 'json' 
-			});*/
 		},
 
 		fetchError: function(){
@@ -205,10 +178,11 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'date'], function($, _, Bac
 		},
 
 		render: function(){
-			//alert('render');
 			app.data.places = this.collection.response.places;
 			this.$el = this.page.find('#events');
 			this.$el.html(this.template({events: this.collection.toJSON(), date:date, going:utils.LocalStore.get('going', {})}));
+			var $footer = this.$el.find('.footer');
+			this.$el.after($footer); //Footer außerhalb des Containers platzieren
 			var self = this;
 			$('.btn-filter-events').click(function(e){
 				e.preventDefault();

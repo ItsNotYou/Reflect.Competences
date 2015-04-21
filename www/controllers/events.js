@@ -59,7 +59,6 @@ app.controllers.events = BackboneMVC.Controller.extend({
 	set_locations: function(){
 		//console.log(this.places);
 		if(this.places) { //Wenn die Locations schon lokal vorhanden sind, Seite anzeigen
-			alert(3);
 			app.loadPage(this.name, 'set_locations', {places:this.places, disabledLocations:this.disabledLocations}).done(function(){
 				
 			});

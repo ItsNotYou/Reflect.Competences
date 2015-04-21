@@ -139,7 +139,7 @@ define([
 				}
 				if(url.charAt(0) == '#')
 					url = url.slice(1); 
-				if(url == 'home')
+				if(url == 'home' || url == '')
 					url = 'main/menu';
 				this.router.navigate(url, {trigger: trigger, replace: false}); //Url auf Controller routen
 			},
@@ -205,7 +205,7 @@ define([
 				
 				
 				var page = new app.views[utils.capitalize(c) + 'Page'];
-				console.log(page.el);
+				//console.log(page.el);
 				// prepare new view for DOM display
 				//$(page.el).attr(page.attributes);
 				
@@ -239,11 +239,17 @@ define([
 					this.firstPage = false;
 				}
 				var content = false;
-				if(!app.data[c]) app.data[c] = {};
+				if(!app.data[c]) 
+					app.data[c] = {};
 				
-				var success = function(s, d){
-					console.log(d);
+				/**
+				* Success function, die nachdem Daten vom Server oder aus dem Cache geholt wurden, oder wenn nichts zu holen ist, ausgeführt wird.
+				* @param s state object (After request with model.fetch or collection.fetch or custom: 'cached' or 'set' to indicate whether it was fetched from cache or from a collection)
+				* @param d data object
+				*/
+				var success = function(s, d){ 
 					if(content) {
+						console.log('content');
 						content.p = params;
 						if(content.beforeRender)
 							content.beforeRender();
@@ -275,19 +281,19 @@ define([
 									response = content.model.response;
 							}
 						}
-						//var vars = d ? (d.vars ? $.extend(true, {}, d.vars) : $.extend(true, {}, d)) : {}; //Params für den View, wenn vorhanden, in das Datenobjekt integrieren
-						//$.extend(vars, params);
-						//
 						console.log(response);
 						if(_.keys(response).length > 0) {
 							//alert('response');
+							if(!app.data[c]) 
+								app.data[c] = {};
+							//console.log(app.data[c]);
 							app.data[c][a] = response; //Daten speichern
 							if(content.model)
 								app.cache[content.model.url] = response;
 							else if(content.collection) {
 								app.cache[content.collection.url] = response;
 							}
-							console.log(app.cache);
+							//console.log(app.cache);
 						}
 						content.render();
 						var $metas = content.$el.find('meta'); //Meta infos aus Seite in den Header integrieren
@@ -303,7 +309,8 @@ define([
 							$pageContainer.find('.ui-header').replaceWith(header);
 						}
 					}
-					console.log(page.el);
+					//console.log(page.el);
+					//alert(2);
 					Q($.mobile.changePage(pageContent, {changeHash: false, transition: transition, reverse: reverse})).done(function(){
 						if(!this.currentView){
 							//$('#pagecontainer').children().first().remove();
@@ -318,16 +325,19 @@ define([
 					});
 				}
 				
+				console.log(app.views);
 				if(app.views[utils.capitalize(c) + utils.capitalize(a)]) { //Wenn eine View-Klasse für Content vorhanden ist: ausführen
 					content = new app.views[utils.capitalize(c) + utils.capitalize(a)](params);
 					content.page = $(page.el);
+					//console.log(content);
 					if((content.model || content.collection) && content.inCollection) { //Element aus der geladenen Collection holen und nicht vom Server
 						var parts = content.inCollection.split('.');
+						//console.log(app.data);
+						//console.log(content.inCollection);
 						try {
 							var list = eval('app.data.' + content.inCollection);
 						} catch(e) {
 						}
-						//console.log(app.data);
 						//console.log(list);
 						if(list) {
 							try {
@@ -339,14 +349,14 @@ define([
 							} catch(e){
 							}
 						}
-						console.log(filteredList);
+						//console.log(filteredList);
 						if(filteredList)
 							d = filteredList[0];
-						console.log(d);
+						//console.log(d);
 					}
-					if(content.collection) {
+					if(content.collection) { //Content hat eine COllection
 						if(app.cache[content.collection.url]) {
-							console.log(app.cache[content.collection.url]);
+							//console.log(app.cache[content.collection.url]);
 							//alert('cached');
 							success('cached', app.cache[content.collection.url]);
 						} else
@@ -356,24 +366,27 @@ define([
 							},
 							dataType: 'json'
 						});
-					} else
-					if(content.model) {
-						console.log(d);
-						if(_.keys(d).length > 0) { //Model bereits in Collection gefunden
-							success('set', d);
+					} else {
+						if(content.model) { //Content hat ein Model
+							console.log(d);
+							if(_.keys(d).length > 0) { //Model bereits in Collection gefunden
+								success('set', d);
+							}
+							else
+							if(app.cache[content.model.url]) {
+								success('cached', app.cache[content.model.url]);
+							} else
+								content.model.fetch({
+									success: success,
+									error: function(){
+									},
+									dataType: 'json'
+								});
+						} else { //Content einfach so
+							success();
 						}
-						else
-						if(app.cache[content.model.url]) {
-							success('cached', app.cache[content.model.url]);
-						} else
-							content.model.fetch({
-								success: success,
-								error: function(){
-								},
-								dataType: 'json'
-							});
 					}
-				} else
+				} else 
 					success();
 
 				return q.promise;
@@ -448,7 +461,7 @@ define([
 				return q.promise;*/
 			},
 			
-			/*
+			/**
 			* Daten vom Server laden
 			* @zu ladende URL
 			*/

@@ -67,7 +67,9 @@ define([
 		}
 		d.settingsUrl = d.settingsUrl ? d.settingsUrl : false;
 		d.back = d.back ? d.back : false;
+		d.backCaption = d.backCaption ? d.backCaption : false;
 		d.title = d.title ? d.title : '';
+		d.klass = d.klass ? ' ' + d.klass : '';
 		d.store = LocalStore;
 		return _.template(renderheader.headerTemplateString, d);
 	};
