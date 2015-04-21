@@ -289,7 +289,7 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'modules/campusmenu', 'modu
 		roomsModel.rooms.fetch({reset: true});
 	}
 
-	var RoomPageView = Backbone.View.extend({
+	app.views.RoomIndex = Backbone.View.extend({
 		attributes: {"id": 'room'},
 
 		initialize: function(){
@@ -297,6 +297,7 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'modules/campusmenu', 'modu
 		},
 
 		render: function(){
+			this.$el = this.page;
 			this.$el.html(this.template({}));
 			
 			// Switch infotext header according to view state (collapsible expanded or collapsible collapsed)
@@ -318,6 +319,20 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'modules/campusmenu', 'modu
 			return this;
 		}
 	});
+	
+	app.views.RoomPage = Backbone.View.extend({
+		attributes: {"id": 'room'},
 
-	return RoomPageView;
+		initialize: function(){
+
+		},
+
+		render: function(){
+			this.$el.html('');
+			
+			return this;
+		}
+	});
+
+	return app.views;
 });
