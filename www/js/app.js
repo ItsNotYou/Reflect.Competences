@@ -255,6 +255,8 @@ define([
 				var success = function(s, d){ 
 					if(content) {
 						console.log('content');
+						if(content.fetchSuccess)
+							content.fetchSuccess(s, d);
 						content.p = params;
 						if(content.beforeRender)
 							content.beforeRender();
@@ -340,6 +342,7 @@ define([
 					content = new app.views[utils.capitalize(c) + utils.capitalize(a)](params);
 					content.page = $(page.el);
 					console.log($(page.el));
+			
 					if((content.model || content.collection) && content.inCollection) { //Element aus der geladenen Collection holen und nicht vom Server
 						var parts = content.inCollection.split('.');
 						//console.log(app.data);
@@ -369,13 +372,14 @@ define([
 							//console.log(app.cache[content.collection.url]);
 							//alert('cached');
 							success('cached', app.cache[content.collection.url]);
-						} else
-						content.collection.fetch({
-							success: success,
-							error: function(){
-							},
-							dataType: 'json'
-						});
+						} else {
+							content.collection.fetch({
+								success: success,
+								error: function(){
+								},
+								dataType: 'json'
+							});
+						}
 					} else {
 						if(content.model) { //Content hat ein Model
 							console.log(d);

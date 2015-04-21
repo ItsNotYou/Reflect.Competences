@@ -4,7 +4,7 @@
 app.controllers.opening = BackboneMVC.Controller.extend({
     name: 'opening',
 	places: false,
-	views:["opening.index","opening.view","opening.set_locations","opening.place"], //View files des Controllers
+	views:["opening","opening_detail"], //View files des Controllers
 	modules : {'opening' : 'openingPageView'},
 	
 	/*
@@ -20,7 +20,7 @@ app.controllers.opening = BackboneMVC.Controller.extend({
 	* Öffnungszeiten anzeigen
 	*/
     index:function(){
-		app.loadPage(this.name, 'index', {going:this.going});
+		app.loadPage(this.name, 'index');
     },
 	
 	

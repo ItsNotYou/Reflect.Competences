@@ -54,7 +54,7 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'moment'], function($, _, B
 	var Openings = Backbone.Collection.extend({
 		model: Opening,
 		url: 'js/json/opening.json',
-    comparator: 'name'
+    	comparator: 'name'
 	});
 
 	var OpeningView = Backbone.View.extend({
@@ -72,26 +72,21 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'moment'], function($, _, B
 		}
 	});
 
-	var OpeningsView = Backbone.View.extend({
+	app.views.OpeningIndex = Backbone.View.extend({
 		anchor: '#opening-list',
 
 		initialize: function(){
 			_.bindAll(this, 'fetchSuccess', 'fetchError', 'render');
-			this.collection.fetch({
-				success: this.fetchSuccess,
-				error: this.fetchError
-			});
+			this.collection = new Openings();
 		},
 
 		fetchSuccess: function() {
-      this.collection = this.addTextToTimes(this.collection);
-      var now = new Date();
+      		this.collection = this.addTextToTimes(this.collection);
+     		var now = new Date();
 
-      _.each(this.collection.models, function(model){
-        model.attributes.statusOpenNow = dateutils.statusAtPlaceAndDate(model.attributes, now);
-      });
-
-			this.render();
+     		_.each(this.collection.models, function(model){
+        		model.attributes.statusOpenNow = dateutils.statusAtPlaceAndDate(model.attributes, now);
+      		});
 		},
 
 		addTextToTimes: function (collection) {
@@ -124,11 +119,11 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'moment'], function($, _, B
             return collection;
         },
 
-    fromToDaytimeString: function(from, to) {
-			var string = '' + from + ' - ' + to + ' Uhr';
-      // console.log('string',string);
-      return string;
-    },
+		fromToDaytimeString: function(from, to) {
+				var string = '' + from + ' - ' + to + ' Uhr';
+		  // console.log('string',string);
+		  return string;
+		},
 
 		fetchError: function() {
 			throw new Error('Error loading Opening-JSON file');
@@ -150,22 +145,20 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'moment'], function($, _, B
 	/**
 	 *	BackboneView - Opening Page View
 	 */
-	var OpeningPageView = Backbone.View.extend({
-    attributes: {"id": "opening"},
+	app.views.OpeningPage = Backbone.View.extend({
+    	ttributes: {"id": "opening"},
 
 		initialize: function(){
 			this.template = utils.rendertmpl('opening');
 		},
 
     	render: function(){
-    		this.$el.html(this.template({}));
-    		var openings = new Openings();
-    		var openingsView = new OpeningsView({collection: openings});
+			this.$el.html(this.template({}));
     		this.$el.trigger("create");
     		return this;
 		}
 
   });
 
-  return OpeningPageView;
+  return app.views;
 });
