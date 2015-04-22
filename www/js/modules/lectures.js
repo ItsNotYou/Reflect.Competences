@@ -232,7 +232,7 @@ define(['jquery', 'underscore', 'backbone', 'utils'], function($, _, Backbone, u
 
 	var vvzHistory = new VvzHistory;
 
-	var LecturesPageView = Backbone.View.extend({
+	app.views.LecturesIndex = Backbone.View.extend({
 		attributes: {"id": "lectures"},
 
 		events: {
@@ -297,6 +297,7 @@ define(['jquery', 'underscore', 'backbone', 'utils'], function($, _, Backbone, u
 
 		render: function(){
 			$(this.el).html(this.template({}));
+			this.page.html(this.$el);
 			$(this.el).trigger("create");
 
 			this.trigger("render");
@@ -305,7 +306,7 @@ define(['jquery', 'underscore', 'backbone', 'utils'], function($, _, Backbone, u
 		}
 	});
 
-	return LecturesPageView;
+	return app.views;
 });
 
 function asArray(subject) {

@@ -150,7 +150,7 @@ define([
 	 *	CalendarPageView - BackboneView
 	 * 	Main View fpr calendar
 	 */
-	var CalendarPageView = utils.GesturesView.extend({
+	app.views.CalendarIndex = utils.GesturesView.extend({
 
 		attributes: {"id": "calendar"},
 
@@ -247,11 +247,12 @@ define([
 
 		render: function(){
 			this.$el.html(this.template({day: this.day}));
+			this.page.html(this.$el);
 			this.$el.trigger("create");
 			this.trigger("prepareCourses");
 			return this;
 		}
 	});
 
-	return CalendarPageView;
+	return app.views;
 });
