@@ -73,8 +73,7 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'modules/transport.util'],
   /**
    *  Transport Page View
    */
-  var TransportPageView = Backbone.View.extend({
-    attributes: {"id": "transport"},
+  app.views.TransportIndex = Backbone.View.extend({
 
     initialize: function(){
       this.collection = new transport.TransportStations();
@@ -102,35 +101,55 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'modules/transport.util'],
 
       // check for existing journeys otherwise fetch
       if (this.collection.where(view_state)[0].get('journeys').length == 0){
-        this.collection.fetch({success: function(){console.log('succ');}, error: function() { console.log(arguments); }});
-      }else{
+		var _this = this; 
+        this.collection.fetch({
+			success: function(){
+				console.log('succ'); 
+				_this.trigger("renderTransportList");
+			}, error: function() {
+				console.log(arguments); 
+			}
+		});
+		
+      } else {
         this.trigger("renderTransportList");
       }
     },
 
     render: function(){
-      this.$el.html(this.template({}));
-
-      transportViewNavbar = new NavigationView({
-        el: this.$el.find("#from-station-navbar")
-      });
-      var that = this;
-      transportViewNavbar.on('select', function(buttonName){
-        view_state = {campus: buttonName}
-        first_journey = that.collection.where(view_state)[0]
-        transportViewTransportList.collection  = first_journey.get('journeys');
-        transportViewTransportList.stationName = first_journey.get('name');
-        transportViewTransportList.stationTime = first_journey.get('stationTime');
-        transportViewTransportList.render();
-      });
-
-      this.$el.trigger("create");
-      this.trigger("prepareJouneys");
-      return this;
+		this.$el = this.page;
+		this.$el.html(this.template({}));
+		transportViewNavbar = new NavigationView({
+			el: this.$el.find("#from-station-navbar")
+		});
+		var that = this;
+		transportViewNavbar.on('select', function(buttonName){
+			view_state = {campus: buttonName}
+			first_journey = that.collection.where(view_state)[0]
+			transportViewTransportList.collection  = first_journey.get('journeys');
+			transportViewTransportList.stationName = first_journey.get('name');
+			transportViewTransportList.stationTime = first_journey.get('stationTime');
+			transportViewTransportList.render();
+		});
+		
+		this.$el.trigger("create");
+		this.trigger("prepareJouneys");
+		return this;
     }
 
   });
+  
+  app.views.TransportPage = Backbone.View.extend({
 
-  return TransportPageView;
+		initialize: function(){
+		},
+
+		render: function(){
+			this.$el.html('');
+			return this;
+		}
+  });
+
+  return app.views;
 
 });

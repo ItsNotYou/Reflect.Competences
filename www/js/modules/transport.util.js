@@ -3,7 +3,11 @@ define([
   'underscore',
   'backbone',
   'utils',
-  'moment'
+  'moment',
+  'datebox', 
+  'lib/jqm-datebox.mode.calbox.min', 
+  'lib/jqm-datebox.mode.datebox.min', 
+  'lib/jquery.mobile.datebox.i18n.de.utf8'
 ], function($, _, Backbone, utils, moment){
 
 	function endpoint(){
@@ -88,11 +92,13 @@ define([
         this.add(new TransportStation({campus: "Palais", name: "Potsdam, Neues Palais", externalId: "009230132#86"}));
       },
 
-      fetch: function(){
+      fetch: function(options){
       	this.trigger("request");
       	var that = this;
 
-      	var successORerror = _.after(3, function(){
+      	var successORerror = _.after(3, function(s, d){
+			if(options && options.success) //Success function weiterreichen
+				options.success(s, d); 
       		that.trigger("sync");
       	});
 
@@ -102,16 +108,18 @@ define([
       		var timeString = lastDepartingTime.format('HH:mm:ss');
 
           model.fetch({	data: abgehendeVerbindungen(model.get('externalId'), timeString),
-          							type: 'POST',
-          							contentType: 'text/xml',
-          							dataType: 'xml',
-          							crossDomain: true,
-          							success: function(){ successORerror(); },
-          							error: function(error, a, b){
-          								var errorPage = new utils.ErrorView({el: '#search-results', msg: 'Die Transportsuche ist momentan nicht verfügbar', module: 'transport'});
-          								successORerror();
-          							}
-                      });
+					type: 'POST',
+					contentType: 'text/xml',
+					dataType: 'xml',
+					crossDomain: true,
+					success: function(s, d){ 
+						successORerror(s, d); 
+					},
+					error: function(error, a, b){
+						var errorPage = new utils.ErrorView({el: '#search-results', msg: 'Die Transportsuche ist momentan nicht verfügbar', module: 'transport'});
+						successORerror();
+					}
+			  });
         });
       }
   });

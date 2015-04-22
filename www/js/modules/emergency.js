@@ -33,19 +33,12 @@ define(['jquery', 'underscore', 'backbone', 'utils'], function($, _, Backbone, u
 	});
 
 	// view for several emergency calls
-	var EmergencyCallsView = Backbone.View.extend({
+	app.views.EmergencyIndex = Backbone.View.extend({
 		anchor: '#emergency-list',
 
 		initialize: function(){
-			_.bindAll(this, 'fetchSuccess', 'fetchError', 'render');
-			this.collection.fetch({
-				success: this.fetchSuccess,
-				error: this.fetchError
-			});
-		},
-
-		fetchSuccess: function() {
-			this.render();
+			this.collection = new EmergencyCalls();
+			_.bindAll(this, 'fetchError', 'render');
 		},
 
 		fetchError: function() {
@@ -54,6 +47,7 @@ define(['jquery', 'underscore', 'backbone', 'utils'], function($, _, Backbone, u
 
 		render: function(){
 			this.el = $(this.anchor);
+			console.log(this.collection);
 			// iterate over collection and call EmergencyCallViews render method
 			this.collection.each(function(emergencycall){
 				var emergencyCall = new EmergencyCallView({model: emergencycall});
@@ -66,7 +60,7 @@ define(['jquery', 'underscore', 'backbone', 'utils'], function($, _, Backbone, u
 	});
 
 	// view for the emergency page
-	var EmergencyPageView = Backbone.View.extend({
+	app.views.EmergencyPage = Backbone.View.extend({
 
 		initialize: function() {
 			this.template = utils.rendertmpl('emergency');
@@ -74,12 +68,10 @@ define(['jquery', 'underscore', 'backbone', 'utils'], function($, _, Backbone, u
 
 		render: function() {
 			this.$el.html(this.template({}));
-			var emergencyCalls = new EmergencyCalls();
-			var emergencyCallsView = new EmergencyCallsView({collection: emergencyCalls});
 			this.$el.trigger("create");
 			return this;
 		}
 	});
 
-	return EmergencyPageView;
+	return app.views;
 });

@@ -270,8 +270,7 @@ define([
    * BackboneView - Transport2PageView
    * Main View for complex transport search
    */
-  var Transport2PageView = Backbone.View.extend({
-    attributes: {"id": "transport2"},
+  app.views.TransportPlan = Backbone.View.extend({
 
     events: {
       'click .ui-input-datebox a': 'datetimeBox'
@@ -294,7 +293,8 @@ define([
     },
 
     render: function(){
-      this.$el.html(this.template({}));
+		this.$el = this.page;
+      	this.$el.html(this.template({}));
 	    // Listen for Events from station
 	    Transport.view.FromStation = new NavigationView({
 	      el: this.$el.find("#fromStation2")
@@ -328,11 +328,11 @@ define([
 	    });
 	    Transport.view.ComplexSearch.render();
 
-      this.$el.trigger("create");
-      return this;
+      	this.$el.trigger("create");
+      	return this;
     }
   });
 
-  return Transport2PageView;
+  return app.views;
 
 });

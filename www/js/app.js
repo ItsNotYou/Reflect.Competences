@@ -23,7 +23,7 @@ define([
 		app = {
 			c: {}, //Controller-Objekte werden in diesem Array abgelegt
 			controllers: {}, //Controllerklassen
-			controllerList: ["controllers/main", "controllers/events", "controllers/news", "controllers/opening", "controllers/sitemap", "controllers/room"], //In der app vorhandene Controller
+			controllerList: ["controllers/main", "controllers/events", "controllers/news", "controllers/opening", "controllers/sitemap", "controllers/room", "controllers/transport", "controllers/mensa", "controllers/emergency"], //In der app vorhandene Controller
 			viewType:"text/x-underscore-template", //Templateenginekennung (Underscore)
 			requests : [], //Speichert die Rückgabe für jede URL (Cache)
 			cacheTimes: [], //Speichert für jede URL die letzte Zeit, wann diese vom Server geladen wurde
@@ -322,7 +322,6 @@ define([
 						}
 					}
 					//console.log(page.el);
-					//alert(2);
 					Q($.mobile.changePage(pageContent, {changeHash: false, transition: transition, reverse: reverse})).done(function(){
 						if(!this.currentView){
 							//$('#pagecontainer').children().first().remove();
@@ -336,7 +335,6 @@ define([
 							q.resolve(d, content);
 					});
 				}
-				
 				console.log(app.views);
 				if(app.views[utils.capitalize(c) + utils.capitalize(a)]) { //Wenn eine View-Klasse für Content vorhanden ist: ausführen
 					app.currentView = {};
@@ -364,19 +362,17 @@ define([
 							}
 						}
 						//console.log(filteredList);
-						if(filteredList)
+						if(filteredList) //Element in Liste gefunden
 							d = filteredList[0];
-						//console.log(d);
 					}
-					if(content.collection) { //Content hat eine COllection
+					if(content.collection) { //Content hat eine Collection
 						if(app.cache[content.collection.url]) {
-							//console.log(app.cache[content.collection.url]);
-							//alert('cached');
 							success('cached', app.cache[content.collection.url]);
 						} else {
 							content.collection.fetch({
 								success: success,
 								error: function(){
+									
 								},
 								dataType: 'json'
 							});
@@ -584,7 +580,7 @@ define([
 						$this.addClass('ui-btn-active');
 						self.route(href);
 					}
-					if(!target || target != '_system') {
+					if((!target || target != '_system') && (!rel || rel != 'external')) {
 						e.preventDefault();
 					} else {
 
