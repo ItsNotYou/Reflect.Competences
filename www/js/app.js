@@ -23,7 +23,7 @@ define([
 		app = {
 			c: {}, //Controller-Objekte werden in diesem Array abgelegt
 			controllers: {}, //Controllerklassen
-			controllerList: ["controllers/main", "controllers/events", "controllers/news", "controllers/opening", "controllers/sitemap", "controllers/room", "controllers/transport", "controllers/mensa", "controllers/emergency"], //In der app vorhandene Controller
+			controllerList: ["controllers/main", "controllers/events", "controllers/news", "controllers/opening", "controllers/sitemap", "controllers/room", "controllers/transport", "controllers/mensa", "controllers/emergency", "controllers/library"], //In der app vorhandene Controller
 			viewType:"text/x-underscore-template", //Templateenginekennung (Underscore)
 			requests : [], //Speichert die Rückgabe für jede URL (Cache)
 			cacheTimes: [], //Speichert für jede URL die letzte Zeit, wann diese vom Server geladen wurde
@@ -204,7 +204,16 @@ define([
 				}*/
 				
 				console.log(app.views);
-				var page = new app.views[utils.capitalize(c) + 'Page'];
+				var pageName = utils.capitalize(c) + 'Page';
+				if(!app.views[pageName]) {
+					app.views[pageName] = Backbone.View.extend({
+						render: function(){
+							this.$el.html('');
+							return this;
+						}
+					});
+				}
+				var page = new app.views[pageName];
 				//console.log(page.el);
 				// prepare new view for DOM display
 				//$(page.el).attr(page.attributes);

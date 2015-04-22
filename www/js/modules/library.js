@@ -596,7 +596,7 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'q', 'moment'], function($,
    * Backbone View - Search
    * Main View for submitting search requests
    */
-  var LibraryPageView = Backbone.View.extend({
+  app.views.LibraryIndex = Backbone.View.extend({
     attributes: {"id": 'library'},
 
     events: {
@@ -610,7 +610,7 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'q', 'moment'], function($,
 
     render: function(){
       this.$el.html(this.template({keyword: App.models.currentSearch.get('query')}));
-
+	  this.page.html(this.$el);
       // initialize Main Views
       App.view.SearchResults = new App.view.BookList({
         model: App.models.currentSearch,
@@ -649,5 +649,5 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'q', 'moment'], function($,
     }
   });
 
-  return LibraryPageView;
+  return app.views;
 });

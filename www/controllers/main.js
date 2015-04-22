@@ -3,7 +3,6 @@
 */
 app.controllers.main = BackboneMVC.Controller.extend({
     name: 'main',
-	views:["home"], //View files des Controllers
 	modules:{"home" : "HomePageView"},
 	
 	/*

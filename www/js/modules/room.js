@@ -322,14 +322,8 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'modules/campusmenu', 'modu
 	
 	app.views.RoomPage = Backbone.View.extend({
 		attributes: {"id": 'room'},
-
-		initialize: function(){
-
-		},
-
 		render: function(){
 			this.$el.html('');
-			
 			return this;
 		}
 	});
