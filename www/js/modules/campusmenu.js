@@ -6,13 +6,15 @@ define(['jquery', 'underscore', 'backbone', 'jquerymobile'], function($, _, Back
 		},
 
 		_create: function() {
+			var url = Backbone.history.fragment.split('/');
+			url = url[0]+'/'+url[1];
 			// create html code
 			this.element.append(
 				"<div data-role='navbar'> \
                     <ul> \
-                        <li><a rel='norout' href='#sitemap/index/griebnitzsee' class='location-menu location-menu-default'>Griebnitzsee</a></li> \
-                        <li><a rel='norout' href='#sitemap/index/neuespalais' class='location-menu'>Neues Palais</a></li> \
-                        <li><a rel='norout' href='#sitemap/index/golm' class='location-menu'>Golm</a></li> \
+                        <li><a rel='norout' href='#"+url+"/griebnitzsee' class='location-menu location-menu-default'>Griebnitzsee</a></li> \
+                        <li><a rel='norout' href='#"+url+"/neuespalais' class='location-menu'>Neues Palais</a></li> \
+                        <li><a rel='norout' href='#"+url+"/golm' class='location-menu'>Golm</a></li> \
                     </ul> \
                 </div>");
 			this.element.trigger("create");

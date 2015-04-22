@@ -1,6 +1,6 @@
 define(['jquery', 'underscore', 'backbone', 'utils'], function($, _, Backbone, utils){
 
-	var ImpressumPageView = Backbone.View.extend({
+	app.views.ImpressumIndex = Backbone.View.extend({
 		attributes: {"id": "impressum"},
 
 		initialize: function(){
@@ -9,9 +9,10 @@ define(['jquery', 'underscore', 'backbone', 'utils'], function($, _, Backbone, u
 
 		render: function(){
 			$(this.el).html(this.template({}));
+			this.page.html(this.$el);
 			return this;
 		}
 	});
 
-	return ImpressumPageView;
+	return app.views;
 });

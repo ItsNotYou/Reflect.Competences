@@ -23,7 +23,12 @@ define([
 		app = {
 			c: {}, //Controller-Objekte werden in diesem Array abgelegt
 			controllers: {}, //Controllerklassen
-			controllerList: ["controllers/main", "controllers/events", "controllers/news", "controllers/opening", "controllers/sitemap", "controllers/room", "controllers/transport", "controllers/mensa", "controllers/emergency", "controllers/library"], //In der app vorhandene Controller
+			controllerList: [
+				"controllers/main", 
+				"controllers/events", 
+				"controllers/news", 
+				"controllers/campus" //Onepager in einem Controller um platz zu sparen
+			], //In der app vorhandene Controller
 			viewType:"text/x-underscore-template", //Templateenginekennung (Underscore)
 			requests : [], //Speichert die Rückgabe für jede URL (Cache)
 			cacheTimes: [], //Speichert für jede URL die letzte Zeit, wann diese vom Server geladen wurde
@@ -347,14 +352,13 @@ define([
 				console.log(app.views);
 				if(app.views[utils.capitalize(c) + utils.capitalize(a)]) { //Wenn eine View-Klasse für Content vorhanden ist: ausführen
 					app.currentView = {};
-					app.currentView = content = new app.views[utils.capitalize(c) + utils.capitalize(a)](params);
+					app.currentView = content = new app.views[utils.capitalize(c) + utils.capitalize(a)](params); //app.currentView kann als Referenz im HTML z.b. im onclick-Event verwendet werden
 					content.page = $(page.el);
 					console.log($(page.el));
 			
 					if((content.model || content.collection) && content.inCollection) { //Element aus der geladenen Collection holen und nicht vom Server
 						var parts = content.inCollection.split('.');
 						//console.log(app.data);
-						//console.log(content.inCollection);
 						try {
 							var list = eval('app.data.' + content.inCollection);
 						} catch(e) {
@@ -377,7 +381,7 @@ define([
 					if(content.collection) { //Content hat eine Collection
 						if(app.cache[content.collection.url]) {
 							success('cached', app.cache[content.collection.url]);
-						} else {
+						} else if(content.collection.url) { //Collection abrufbar von URL
 							content.collection.fetch({
 								success: success,
 								error: function(){
@@ -385,6 +389,8 @@ define([
 								},
 								dataType: 'json'
 							});
+						} else {
+							success();
 						}
 					} else {
 						if(content.model) { //Content hat ein Model
@@ -393,15 +399,18 @@ define([
 								success('set', d);
 							}
 							else
-							if(app.cache[content.model.url]) {
+							if(app.cache[content.model.url]) { //Model in cache
 								success('cached', app.cache[content.model.url]);
-							} else
+							} else if(content.model.url) { //Model abrufbar von URL
 								content.model.fetch({
 									success: success,
 									error: function(){
 									},
 									dataType: 'json'
 								});
+							} else {
+								success();
+							}
 						} else { //Content einfach so
 							success();
 						}
@@ -498,6 +507,7 @@ define([
 			* Layout aktualsieren (Nach Resize, Orientation Changed, Initialisierung)
 			*/
 			updateLayout:function(){
+				/*
 				if(!this.header) { //Initialisierung der Variablen
 					this.body = $('#wrapper');
 					this.header = $('#the_header');
@@ -521,6 +531,7 @@ define([
 				if(window.footerAnimating) fheight = 1;
 				var height = this.body.height() - hheight - fheight - this.contentOuter + 3;
 				this.layoutCSS.html('.ui-content{height:'+height+'px !important;} .app-page{padding-top:'+(hheight - 1)+'px !important;}'); //Seiteninhaltscontainergröße festlegen
+				*/
 			},
 			
 			/**
@@ -565,13 +576,13 @@ define([
 							self.updateLayout();
 						});*/
 					} else {  //Sonst Footer ausblenden
-						self.footer.animate({'left':(self.footer.width() * dir)+'px'}, duration, function(){
+						/*self.footer.animate({'left':(self.footer.width() * dir)+'px'}, duration, function(){
 							self.footer[0].style.display = 'none';
 							self.updateLayout();
 							window.footerAnimating = false;
-						});
+						});*/
 					}
-					self.updateLayout(animating);
+					//self.updateLayout(animating);
 				});
 				
 				$(document).on('click', 'a[data-rel="back"]', function(){ //Backbutton clicks auf zurücknavigieren mappen

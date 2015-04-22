@@ -22,7 +22,7 @@ define([
 	 */
 	var PersonList = Backbone.Collection.extend({
 		model: Person,
-
+		
 		parse:function(response){
 			return response.people;
 		}
@@ -50,7 +50,7 @@ define([
 	/**
 	 *	BackvoneView - PeoplePageView
 	 */
-	var PeoplePageView = Backbone.View.extend({
+	app.views.PeopleIndex = Backbone.View.extend({
 		attributes: {"id": "people"},
 
 		events: {
@@ -105,11 +105,12 @@ define([
 
 		render: function(){
 			this.$el.html(this.template({}));
+			this.page.html(this.$el);
 			this.LoadingView = new utils.LoadingView({collection: this.collection, el: this.$("#loadingSpinner")});
 			this.$el.trigger("create");
 			return this;
 		}
 	});
 
-  return PeoplePageView;
+  return app.views;
 });
