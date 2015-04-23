@@ -74,6 +74,17 @@ define([
 		d.store = LocalStore;
 		return _.template(renderheader.headerTemplateString, d);
 	};
+	
+	// Hold cached data for five minutes, then do a background update
+	var prefillExpires = 5 * 60;
+	var cacheDefaults = function(opts) {
+		var defaults = {cache: true, expires: false, prefill: true, prefillExpires: prefillExpires};
+		if (opts) {
+			return _.defaults(opts, defaults);
+		} else {
+			return defaults;
+		}
+	};
 
 	var removeTabs = function(tmpl) {
 		return tmpl.replace(/\t/g, '');
@@ -477,6 +488,7 @@ define([
 			capitalize:capitalize,
 			LocalStore: LocalStore,
 			GesturesView: GesturesView,
-			activateExtendedAjaxLogging: activateExtendedAjaxLogging
+			activateExtendedAjaxLogging: activateExtendedAjaxLogging,
+			cacheDefaults: cacheDefaults,
 		};
 });

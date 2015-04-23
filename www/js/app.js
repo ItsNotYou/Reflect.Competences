@@ -8,10 +8,11 @@ define([
 	'utils',
 	'q',
 	'fastclick',
+	'Session',
 	'jquerymobile',
 	'datebox',
 	'LocalStore',
-	], function($, _, Backbone, BackboneMVC, _str, utils, Q, FastClick){
+	], function($, _, Backbone, BackboneMVC, _str, utils, Q, FastClick, Session){
 		//AppRouter-Klasse erstellen
 		var AppRouter = BackboneMVC.Router.extend({
 			before:function(route){ //wird komischerweise nur ausgeführt, wenn zurücknavigiert wird. Und genau dafür wird diese Funktion benutzt.
@@ -54,6 +55,7 @@ define([
 			* Intitialisierung
 			*/
 			initialize: function(){
+				app.session = new Session;
 				detectUA($, navigator.userAgent);
 					/**
 				 * Override Backbone.sync to automatically include auth headers according to the url in use
@@ -380,6 +382,7 @@ define([
 							d = filteredList[0];
 					}
 					if(content.collection) { //Content hat eine Collection
+						console.log('Collection');
 						if(app.cache[content.collection.url]) {
 							success('cached', app.cache[content.collection.url]);
 						} else if(content.collection.url) { //Collection abrufbar von URL
@@ -395,7 +398,7 @@ define([
 						}
 					} else {
 						if(content.model) { //Content hat ein Model
-							console.log(d);
+							console.log('Model');
 							if(_.keys(d).length > 0) { //Model bereits in Collection gefunden
 								success('set', d);
 							}
@@ -416,8 +419,10 @@ define([
 							success();
 						}
 					}
-				} else 
+				} else { //Wenn keine Viewklasse vorhanden ist, die page als view nehmen
+					app.currentView = page;
 					success();
+				}
 
 				return q.promise;
 				///OLD CODE

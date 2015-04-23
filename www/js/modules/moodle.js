@@ -161,7 +161,7 @@ define([
    * Backbone View - MoodlePage
    * Startview for Moodle
    */
-  var MoodlePageView = Backbone.View.extend({
+  app.views.MoodleIndex = Backbone.View.extend({
     attributes: {"id": "moodle"},
     model: Session,
 
@@ -262,6 +262,6 @@ define([
     }
   });
 
-  return MoodlePageView;
+  return app.views;
 
 });

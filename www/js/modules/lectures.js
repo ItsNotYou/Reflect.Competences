@@ -41,7 +41,7 @@ define(['jquery', 'underscore', 'backbone', 'utils'], function($, _, Backbone, u
 
 			this.items.url = vvzUrl;
 			this.items.reset();
-			this.items.fetch({reset: true});
+			this.items.fetch(utils.cacheDefaults({reset: true}));
 		}
 	});
 
@@ -139,7 +139,7 @@ define(['jquery', 'underscore', 'backbone', 'utils'], function($, _, Backbone, u
 				new utils.LoadingView({model: submodel, el: this.$(".loading-host")});
 
 				// Fetch from server
-				submodel.fetch();
+				submodel.fetch(utils.cacheDefaults());
 			}
 		}
 	});
@@ -189,7 +189,7 @@ define(['jquery', 'underscore', 'backbone', 'utils'], function($, _, Backbone, u
 		},
 
 		requestFail: function(error) {
-			var errorPage = new utils.ErrorView({el: '#lecturesHost', msg: 'Der PULS-Dienst ist momentan nicht erreichbar.', module: 'lectures', err: error});
+			var errorPage = new utils.ErrorView({el: '#lecturesHost', msg: 'Zurzeit nicht verfügbar.', module: 'lectures', err: error});
 		},
 
 		render: function() {
@@ -232,7 +232,7 @@ define(['jquery', 'underscore', 'backbone', 'utils'], function($, _, Backbone, u
 
 	var vvzHistory = new VvzHistory;
 
-	app.views.LecturesIndex = Backbone.View.extend({
+	app.views.LecturesPage = Backbone.View.extend({
 		attributes: {"id": "lectures"},
 
 		events: {
@@ -243,17 +243,22 @@ define(['jquery', 'underscore', 'backbone', 'utils'], function($, _, Backbone, u
 		initialize: function(){
 			this.template = utils.rendertmpl('lectures');
 			this.listenToOnce(this, "render", this.prepareVvz);
-
+			var _this = this;
 			this.vvzHistory = vvzHistory;
-			this.listenTo(vvzHistory, "vvzChange", function(vvzHistory) { currentVvz.load(vvzHistory); });
-			this.listenTo(vvzHistory, "vvzChange", this.createPopupMenu);
-			this.listenTo(vvzHistory, "vvzChange", this.triggerOpenVvzUrl);
+			this.listenTo(vvzHistory, "vvzChange", function(vvzHistory) { 
+				_this.createPopupMenu(vvzHistory); 
+				_this.triggerOpenVvzUrl(vvzHistory); 
+				currentVvz.load(vvzHistory); 
+			});
+			//this.listenTo(vvzHistory, "vvzChange", this.createPopupMenu);
+			//this.listenTo(vvzHistory, "vvzChange", this.triggerOpenVvzUrl);
 
 			this.listenTo(currentVvz.items, "error", this.requestFail);
+			_.bindAll(this, 'render', 'requestFail', 'selectMenu', 'selectLevel', 'prepareVvz', 'triggerOpenVvzUrl', 'createPopupMenu');
 		},
 
 		requestFail: function(error) {
-			var errorPage = new utils.ErrorView({el: '#lecturesHost', msg: 'Der PULS-Dienst ist momentan nicht erreichbar.', module: 'lectures', err: error});
+			var errorPage = new utils.ErrorView({el: '#lecturesHost', msg: 'Zurzeit nicht verfügbar.', module: 'lectures', err: error});
 		},
 
 		selectMenu: function(ev) {
@@ -293,15 +298,16 @@ define(['jquery', 'underscore', 'backbone', 'utils'], function($, _, Backbone, u
 			});
 			this.$('#selectLevel option').last().attr('selected', 'selected');
 			level.selectmenu('refresh', true);
+			level.attr('href', '#');
 		},
 
 		render: function(){
 			$(this.el).html(this.template({}));
-			this.page.html(this.$el);
+			//this.page.html(this.$el);
 			$(this.el).trigger("create");
 
 			this.trigger("render");
-
+			$('#selectLevel-button').attr('href', '#');
 			return this;
 		}
 	});
