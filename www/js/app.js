@@ -385,7 +385,7 @@ define([
 						console.log('Collection');
 						if(app.cache[content.collection.url]) {
 							success('cached', app.cache[content.collection.url]);
-						} else if(content.collection.url) { //Collection abrufbar von URL
+						} else if(content.collection.url && typeof content.model.url != 'function') { //Collection abrufbar von URL
 							content.collection.fetch({
 								success: success,
 								error: function(){
@@ -405,7 +405,7 @@ define([
 							else
 							if(app.cache[content.model.url]) { //Model in cache
 								success('cached', app.cache[content.model.url]);
-							} else if(content.model.url) { //Model abrufbar von URL
+							} else if(content.model.url && typeof content.model.url != 'function') { //Model abrufbar von URL
 								content.model.fetch({
 									success: success,
 									error: function(){

@@ -156,7 +156,7 @@ define([
     }
   });
 
-
+	console.log(Session);
   /**
    * Backbone View - MoodlePage
    * Startview for Moodle
@@ -170,7 +170,7 @@ define([
         'click .backbutton': 'back'
     },
 
-    initialize: function(){
+    initialize: function(p){
         this.template = utils.rendertmpl('moodle');
         this.listenToOnce(this, "authorize", this.authorize);
         this.listenToOnce(this, "fetchContent", this.fetchContent);

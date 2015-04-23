@@ -246,8 +246,8 @@ define(['jquery', 'underscore', 'backbone', 'utils'], function($, _, Backbone, u
 			var _this = this;
 			this.vvzHistory = vvzHistory;
 			this.listenTo(vvzHistory, "vvzChange", function(vvzHistory) { 
+				_this.triggerOpenVvzUrl(vvzHistory);
 				_this.createPopupMenu(vvzHistory); 
-				_this.triggerOpenVvzUrl(vvzHistory); 
 				currentVvz.load(vvzHistory); 
 			});
 			//this.listenTo(vvzHistory, "vvzChange", this.createPopupMenu);
