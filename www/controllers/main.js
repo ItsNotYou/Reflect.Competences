@@ -3,7 +3,7 @@
 */
 app.controllers.main = BackboneMVC.Controller.extend({
     name: 'main',
-	modules:{"home" : "HomePageView"},
+	modules:{"home" : "HomePageView", "options":"OptionsPageView"},
 	
 	/*
 	* Um evt. Initialisierungsfunktionen auszuführen
@@ -24,7 +24,19 @@ app.controllers.main = BackboneMVC.Controller.extend({
 	
 	logout:function(){
 		var self = this;
-		app.loadPage(this.name, 'logout', {}, 'slide'); //Zeigt das Hauptmenü an
+		app.loadPage('options', 'logout', {}, 'slide'); //Zeigt das Hauptmenü an
+    },
+	
+	login:function(){
+		var self = this;
+		app.loadPage('options', 'login', {}, 'slide'); //Zeigt das Hauptmenü an
+    },
+	
+	options:function(){
+		if(app.session.get('up.session.authenticated'))
+			app.route('main/logout');
+		else
+			app.route('main/login');
     }
 	
 });

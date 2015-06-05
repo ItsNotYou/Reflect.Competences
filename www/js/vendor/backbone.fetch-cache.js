@@ -6,6 +6,7 @@
 // AMD wrapper from https://github.com/umdjs/umd/blob/master/amdWebGlobal.js
 
 (function (root, factory) {
+	return;
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module and set browser global
     define(['underscore', 'backbone', 'jquery'], function (_, Backbone, $) {
@@ -324,17 +325,22 @@
 
     // Delegate to the actual fetch method and store the attributes in the cache
     var jqXHR = superMethods.collectionFetch.apply(this, arguments);
-    // resolve the returned promise when the AJAX call completes
-    jqXHR.done( _.bind(deferred.resolve, this, this) )
-      // Set the new data in the cache
-      .done( _.bind(Backbone.fetchCache.setCache, null, this, opts) )
-      // Reject the promise on fail
-      .fail( _.bind(deferred.reject, this, this) );
-
-    deferred.abort = jqXHR.abort;
-
-    // return a promise which provides the same methods as a jqXHR object
-    return deferred;
+	if(jqXHR) {
+		// resolve the returned promise when the AJAX call completes
+		jqXHR.done( _.bind(deferred.resolve, this, this) )
+		  // Set the new data in the cache
+		  .done( _.bind(Backbone.fetchCache.setCache, null, this, opts) )
+		  // Reject the promise on fail
+		  .fail( _.bind(deferred.reject, this, this) );
+	
+		deferred.abort = jqXHR.abort;
+	
+		// return a promise which provides the same methods as a jqXHR object
+		return deferred;
+	} else {
+		console.log('Backbone-fetch-cache probably not working');
+		return {};
+	}
   };
 
   // Prime the cache from localStorage on initialization

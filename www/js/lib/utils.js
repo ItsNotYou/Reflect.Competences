@@ -2,14 +2,13 @@ define([
 	'jquery',
 	'underscore',
 	'backbone',
-	'app',
 	'Session',
 	'hammerjs',
 	'uri/URI'
-], function($, _, Backbone, app, Session, Hammer, URI){
+], function($, _, Backbone, Session, Hammer, URI){
 
 	/*
-	 * Template Loading Functions
+	 * Template Rendering Function
 	 */
 	var rendertmpl = function(tmpl_name) {
 
@@ -17,7 +16,7 @@ define([
 	    	rendertmpl.tmpl_cache = {};
 	    }
 
-		if ( ! rendertmpl.tmpl_cache[tmpl_name] ) {
+		    if ( ! rendertmpl.tmpl_cache[tmpl_name] ) {
 	        var tmpl_dir = 'js/templates';
 	        var tmpl_url = tmpl_dir + '/' + tmpl_name + '.tmpl';
 		        var tmpl_string;
@@ -44,6 +43,52 @@ define([
 	    	}
 	    	return templateFunction(params);
 	    };
+	};
+	
+	/*
+	 * Template Loading Function, Synchronous AJAX Calls are deprecated and should be replace by a async loading function like this one:
+	 */
+	var loadTemplates = function(tmpl_names) {
+		var q = Q.defer();
+		if (!rendertmpl.tmpl_cache) {
+	    	rendertmpl.tmpl_cache = {};
+	    }
+		var tmpl_name = tmpl_names.shift();
+		/*var renderObj = function(params) {
+	    	var templateFunction = rendertmpl.tmpl_cache[tmpl_name];
+	    	if (params.store == undefined){
+	    		params.store = LocalStore;
+	    	}else{
+	    		throw new error('Variable store already defined in function rendertmpl');
+	    	}
+	    	return templateFunction(params);
+	    };*/
+		
+		if ( !this.tmpl_cache[tmpl_name] ) {
+			var tmpl_string;
+			var _this = this;
+			var tmpl_dir = 'templates';
+	        var tmpl_url = tmpl_dir + '/' + tmpl_name + '.html';
+			$.ajax({
+				url: tmpl_url,
+				method: 'GET',
+				dataType: 'html',
+				async: true, //Async da Sync deprecated
+				success: function(data) {
+					tmpl_string = data;
+					tmpl_string = tmpl_string.replace(/\t/g, '');
+					_this.tmpl_cache[tmpl_name] = _.template(tmpl_string);
+					if(tmpl_names.length > 0) {
+						utils.rendertmpl(tmpl_names).done(function(){
+							q.resolve(_this.tmpl_cache[tmpl_name]);	
+						});
+					} else
+						q.resolve(_this.tmpl_cache[tmpl_name]);
+				}
+			});
+		} else
+			q.resolve(this.tmpl_cache[tmpl_name]);
+		return q.promise;
 	};
 	
 	var renderheader = function(d){
@@ -218,6 +263,42 @@ define([
 	}
 
 	/**
+	 * Takes a model or collection ("subject") and triggers an event if the subject doesn't have any sync processes running in the background.
+	 * This helps if you want to be sure that you don't work on previously cached data if a fetch for fresh data is still going on. The triggered event is named "fullysynced" and has the given subject as first parameter
+	 */
+	var FullySyncedAdapter = Backbone.Model.extend({
+
+		runningCounter: 0,
+
+		initialize: function(properties, options) {
+			this.subject = options.subject;
+
+			this.listenTo(this.subject, "request", this.spinnerOn);
+			this.listenTo(this.subject, "cachesync", this.spinnerHold)
+			this.listenTo(this.subject, "sync", this.spinnerOff);
+			this.listenTo(this.subject, "error", this.spinnerOff);
+		},
+
+		spinnerOn: function() {
+			this.runningCounter++;
+		},
+		
+		spinnerHold: function(model, attr, opts) {
+			// backbone-fetch-cache is used, we should be aware of prefill requests
+			if (opts.prefill) {
+				this.runningCounter++;
+			}
+		},
+
+		spinnerOff: function() {
+			this.runningCounter--;
+			if (this.runningCounter <= 0) {
+				this.trigger("fullysynced", this.subject);
+			}
+		}
+	});
+
+	/**
 	 * Loading View, that listens to a given model or collection.
 	 * As long as the model is loading data from the server, a loading spinner is shown on the given element.
 	 */
@@ -226,6 +307,7 @@ define([
 		initialize: function() {
 			var subject = this.findSubject();
 			if (subject){
+				console.log('Loading View working');
 				this.listenTo(subject, "request", this.spinnerOn);
 				this.listenTo(subject, "sync", this.spinnerOff);
 				this.listenTo(subject, "error", this.spinnerOff);
@@ -239,14 +321,17 @@ define([
 				return this.collection;
 			} else {
 				console.log("LoadingView needs a model or collection to work on. It didn't find one here.");
-				return undefined;
+				return undefined
 			}
 		},
 
 		spinnerOn: function() {
-			this.$el.append("<div class=\"up-loadingSpinner\" style=\"margin: 50px;\">" +
-								"<img src=\"img/loadingspinner.gif\"></img>" +
-							"</div>");
+			this.runningCounter++;
+			if (this.runningCounter == 1) {
+				this.$el.append("<div class=\"up-loadingSpinner extensive-spinner\">" +
+									"<img src=\"img/loadingspinner.gif\"></img>" +
+								"</div>");
+			}
 		},
 
 		spinnerOff: function() {
@@ -294,12 +379,18 @@ define([
 	/**
 	 * Opens external links according to the platform we are on. For apps this means using the InAppBrowser, for desktop browsers this means opening a new tab.
 	 */
-	var overrideExternalLinks = function(event) {
-		var url = $(event.currentTarget).attr("href");
+	var overrideExternalLinks = function(e) {
+		var $this = $(e.target);
+		var href = $this.attr('href') || '';
+		var rel = $this.attr('rel') || false;
+		var target = $this.attr('target');
+		
+		var url = ''+$(e.currentTarget).attr("href");
 		var uri = new URI(url);
 		
 		var internalProtocols = ["http", "https"];
 		var isInternalProtocol = internalProtocols.indexOf(uri.protocol()) >= 0;
+		var isJavascript = uri.protocol().indexOf('javascript') >= 0;
 		var hasProtocol = uri.protocol() !== '';
 		
 		// In the app we consider three cases:
@@ -307,17 +398,23 @@ define([
 		// 2. Protocol is http or https and URL is absolute: we let an InAppBrowser tab handle it
 		// 3. Protocol is something other: we let the system handle it
 		// In the browser, we let the browser handle everything
-		if (window.cordova && isInternalProtocol) {
+		if (/*window.cordova && */isInternalProtocol) {
 			console.log("Opening " + uri + " in new tab");
 			openInTab(url);
+			e.preventDefault();
 			return false;
-		} else if (window.cordova && hasProtocol && !isInternalProtocol) {
+		} else if (window.cordova && hasProtocol && !isInternalProtocol && !isJavascript) {
 			console.log("Opening " + uri + " in system");
 			window.open(url, "_system");
+			e.preventDefault();
 			return false;
-		} else {
+		} else if(href && !isJavascript && rel != 'norout') {
+			$this.addClass('ui-btn-active');
+			$('.ui-btn-active', app.activePage()).removeClass('ui-btn-active');
+			app.route(url);
+			e.preventDefault();
 			console.log("Opening " + url + " internally");
-		}
+		} 
 	};
 	
 	/**
@@ -349,7 +446,8 @@ define([
 		info.set("column", columnNumber);
 
 		console.log("Unhandled error thrown:");
-		console.log(info.attributes);
+		var toLog = $.extend({}, info.attributes);
+		console.log(toLog);
 
 		info.on("error", function(error) {
 			console.warn("Could not log error");
@@ -473,6 +571,17 @@ define([
 		});
 	};
 
+	var defaultTransition = function() {
+		var device = window.device || {data: 'none'};
+		if (device.platform === "ios" || device.platform === "iOS") {
+			$.mobile.changePage.defaults.transition = "fade";
+		} else {
+			$.mobile.changePage.defaults.transition =  "slidefade";
+		}
+
+		return $.mobile.changePage.defaults.transition;
+	};
+
 	return {
 			rendertmpl: rendertmpl,
 			renderheader: renderheader,
@@ -490,5 +599,7 @@ define([
 			GesturesView: GesturesView,
 			activateExtendedAjaxLogging: activateExtendedAjaxLogging,
 			cacheDefaults: cacheDefaults,
+			defaultTransition: defaultTransition,
+			FullySyncedAdapter: FullySyncedAdapter
 		};
 });

@@ -13,7 +13,7 @@ require.config({
         'underscore-string': 'vendor/underscore.string.min',
     	'backbone': 'vendor/backbone-min',
 		'backboneMVC': 'vendor/backbone-mvc',
-        'cache': 'vendor/backbone.fetch-cache.min',
+        'cache': 'vendor/backbone.fetch-cache',
         'geojson': 'lib/GeoJSON',
         'q': 'vendor/q',
         'moment': 'vendor/moment.min',
@@ -66,7 +66,8 @@ requirejs.onError = function(error){
 	if(error.requireType === 'timeout'){
 		console.log('Timeout of RequireJS-Module:'+error.requireModules);
 	}else{
-		throw error;
+		//throw error;
+		console.log(error);
 	}
 };
 

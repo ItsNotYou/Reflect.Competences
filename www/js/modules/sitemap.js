@@ -83,20 +83,6 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'q', 'modules/campusmenu', 
 		}
 	};
 
-	$(document).on("pageinit", "#sitemap", function() {
-		$.getScript('https://www.google.com/jsapi').done(function(){
-			google.load('maps', '3', {other_params: 'sensor=false', callback: function(){
-				settings.url.griebnitzsee.center = new google.maps.LatLng(52.39345677934452, 13.128039836883545);
-				settings.url.neuespalais.center = new google.maps.LatLng(52.400933, 13.011653);
-				settings.url.golm.center = new google.maps.LatLng(52.408716, 12.976138);
-
-				oneSidedGuard.disableBlock();
-			}});
-		}).fail(function(){
-			var errorPage = new utils.ErrorView({el: '#error-placeholder', msg: 'Es ist ein Fehler aufgetreten. Wahrscheinlich besteht keine Internetverbindung.', module:'sitemap'});
-		});
-	});
-
 	function checkUncheck(category) {
 		return function() {
 			var visibility;
@@ -110,9 +96,6 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'q', 'modules/campusmenu', 
 		};
 	}
 
-	$(document).on("pageinit", "#sitemap", function() {
-		$("div[data-role='campusmenu']").campusmenu({ onChange: function(options) { oneSidedGuard.callMultiple(options); } });
-	});
 
 	/*
 	 * initialize map when page is shown
@@ -292,10 +275,6 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'q', 'modules/campusmenu', 
 		$("div[data-role='campusmenu']").campusmenu("changeTo", entry.campus, entry.geo.properties.Name);
 	}
 
-	$(document).on("pageinit", "#sitemap", function() {
-		geo.loadAllOnce();
-	});
-
 	var SearchView = Backbone.View.extend({
 
 		initialize: function(options) {
@@ -431,11 +410,25 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'q', 'modules/campusmenu', 
 
 		initialize: function(){
 			this.template = utils.rendertmpl('sitemap');
+			$.getScript('https://www.google.com/jsapi').done(function(){
+			google.load('maps', '3', {other_params: 'sensor=false', callback: function(){
+					settings.url.griebnitzsee.center = new google.maps.LatLng(52.39345677934452, 13.128039836883545);
+					settings.url.neuespalais.center = new google.maps.LatLng(52.400933, 13.011653);
+					settings.url.golm.center = new google.maps.LatLng(52.408716, 12.976138);
+	
+					oneSidedGuard.disableBlock();
+				}});
+			}).fail(function(){
+				var errorPage = new utils.ErrorView({el: '#error-placeholder', msg: 'Es ist ein Fehler aufgetreten. Wahrscheinlich besteht keine Internetverbindung.', module:'sitemap'});
+			});
+			geo.loadAllOnce();
 		},
 
 		render: function(){
 			this.$el = this.page;
 			this.$el.html(this.template({}));
+			$("div[data-role='campusmenu']").campusmenu({ onChange: function(options) { oneSidedGuard.callMultiple(options); } });
+			$("div[data-role='campusmenu']").campusmenu("pageshow");
 			return this;
 		},
 

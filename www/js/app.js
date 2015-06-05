@@ -40,6 +40,8 @@ define([
 			views:{},
 			models:{},
 			data: {},
+			requiresAuth: ['calendar', 'moodle', 'grades', 'people'],// routes that need authentication
+			preventAccessWhenAuth: [],// routes to prevent authentication when already authenticated
 			authUrls: ["https://api.uni-potsdam.de/endpoints/roomsAPI",
 					"https://api.uni-potsdam.de/endpoints/libraryAPI",
 					"https://api.uni-potsdam.de/endpoints/pulsAPI",
@@ -132,7 +134,6 @@ define([
 					}
 				});
 				this.loadControllers(this.controllerList); //Alle Controller laden
-				$(document).on("click", "a", utils.overrideExternalLinks);
 			},
 			history:[], //trackt aufgerufene URLs unabhängig von Backbone um auf Fehler besser reagieren zu können
 			/*
@@ -210,10 +211,10 @@ define([
 				/*if(!this.currentView){
 					$('#pagecontainer').children().first().remove();
 				}*/
-				
 				console.log(app.views);
 				var pageName = utils.capitalize(c) + 'Page';
 				if(!app.views[pageName]) {
+					console.log('NOT');
 					app.views[pageName] = Backbone.View.extend({
 						render: function(){
 							this.$el.html('');
@@ -221,11 +222,17 @@ define([
 						}
 					});
 				}
-				var page = new app.views[pageName];
+				console.log(pageName);
+				
+				var page = new app.views[pageName]; console.log(page);
+				var allowed = app.checkAuth(c) && app.checkAuth(a);
+				if(!allowed) {
+					q.resolve();
+					return {done:function(d){}};
+				}
 				//console.log(page.el);
 				// prepare new view for DOM display
 				//$(page.el).attr(page.attributes);
-				
 				page.render();
 				console.log(utils.capitalize(c) + utils.capitalize(a));
 
@@ -298,14 +305,14 @@ define([
 								if(content.collection.response)
 									response = content.collection.response;
 							}
-							if(content.model) {
+							
+							if(content.model && content.model.toJSON) {
 								response = d = content.model.toJSON();
 								content.model.p = params;
 								if(content.model.response)
 									response = content.model.response;
 							}
 						}
-						console.log(response);
 						if(_.keys(response).length > 0) {
 							//alert('response');
 							if(!app.data[c]) 
@@ -338,75 +345,49 @@ define([
 							}
 						}
 					}
-					//console.log(page.el);
-					Q($.mobile.changePage(pageContent, {changeHash: false, transition: transition, reverse: reverse})).done(function(){
-						if(!this.currentView){
-							//$('#pagecontainer').children().first().remove();
-							$('body').css('overflow', 'auto');
-							$("body").fadeIn(100);
-						}
-						this.currentView = page;
-						if(_.keys(response).length > 0)
+					if(_.keys(response).length > 0)
 							q.resolve(response, content);
 						else
 							q.resolve(d, content);
-					});
 				}
-				console.log(app.views);
-				if(app.views[utils.capitalize(c) + utils.capitalize(a)]) { //Wenn eine View-Klasse für Content vorhanden ist: ausführen
-					app.currentView = {};
-					app.currentView = content = new app.views[utils.capitalize(c) + utils.capitalize(a)](params); //app.currentView kann als Referenz im HTML z.b. im onclick-Event verwendet werden
-					content.page = $(page.el);
-					console.log($(page.el));
-			
-					if((content.model || content.collection) && content.inCollection) { //Element aus der geladenen Collection holen und nicht vom Server
-						var parts = content.inCollection.split('.');
-						//console.log(app.data);
-						try {
-							var list = eval('app.data.' + content.inCollection);
-						} catch(e) {
-						}
-						//console.log(list);
-						if(list) {
+				
+				/** 
+				* Wird nach Pagetransition ausgeführt
+				*/
+				var afterTransition = function(){
+					//console.log(app.views);
+					if(app.views[utils.capitalize(c) + utils.capitalize(a)]) { //Wenn eine View-Klasse für Content vorhanden ist: ausführen
+						app.currentView = {};
+						app.currentView = content = new app.views[utils.capitalize(c) + utils.capitalize(a)](params); //app.currentView kann als Referenz im HTML z.b. im onclick-Event verwendet werden
+						content.page = $(page.el);
+				
+						if((content.model || content.collection) && content.inCollection) { //Element aus der geladenen Collection holen und nicht vom Server
+							var parts = content.inCollection.split('.');
+							//console.log(app.data);
 							try {
-								var filteredList = _.filter(list, function(item){
-									return _.some(item, function(item){
-										return eval('item.' + content.idInCollection) == params.id;
+								var list = eval('app.data.' + content.inCollection);
+							} catch(e) {
+							}
+							//console.log(list);
+							if(list) {
+								try {
+									var filteredList = _.filter(list, function(item){
+										return _.some(item, function(item){
+											return eval('item.' + content.idInCollection) == params.id;
+										});
 									});
-								});
-							} catch(e){
+								} catch(e){
+								}
 							}
+							//console.log(filteredList);
+							if(filteredList) //Element in Liste gefunden
+								d = filteredList[0];
 						}
-						//console.log(filteredList);
-						if(filteredList) //Element in Liste gefunden
-							d = filteredList[0];
-					}
-					if(content.collection) { //Content hat eine Collection
-						console.log('Collection');
-						if(app.cache[content.collection.url]) {
-							success('cached', app.cache[content.collection.url]);
-						} else if(content.collection.url && typeof content.model.url != 'function') { //Collection abrufbar von URL
-							content.collection.fetch({
-								success: success,
-								error: function(){
-									
-								},
-								dataType: 'json'
-							});
-						} else {
-							success();
-						}
-					} else {
-						if(content.model) { //Content hat ein Model
-							console.log('Model');
-							if(_.keys(d).length > 0) { //Model bereits in Collection gefunden
-								success('set', d);
-							}
-							else
-							if(app.cache[content.model.url]) { //Model in cache
-								success('cached', app.cache[content.model.url]);
-							} else if(content.model.url && typeof content.model.url != 'function') { //Model abrufbar von URL
-								content.model.fetch({
+						if(content.collection) { //Content hat eine Collection
+							if(app.cache[content.collection.url]) {
+								success('cached', app.cache[content.collection.url]);
+							} else if(content.collection.url && (!content.model || typeof content.model.url != 'function')) { //Collection abrufbar von URL
+								content.collection.fetch({
 									success: success,
 									error: function(){
 									},
@@ -415,85 +396,88 @@ define([
 							} else {
 								success();
 							}
-						} else { //Content einfach so
-							success();
+						} else {
+							if(content.model) { //Content hat ein Model
+								console.log('Model');
+								if(_.keys(d).length > 0) { //Model bereits in Collection gefunden
+									success('set', d);
+								}
+								else
+								if(app.cache[content.model.url]) { //Model in cache
+									success('cached', app.cache[content.model.url]);
+								} else if(content.model.url && typeof content.model.url != 'function') { //Model abrufbar von URL
+									content.model.fetch({
+										success: success,
+										error: function(){
+										},
+										dataType: 'json'
+									});
+								} else {
+									success();
+								}
+							} else { //Content einfach so
+								success();
+							}
 						}
+					} else { //Wenn keine Viewklasse vorhanden ist, die page als view nehmen
+						app.currentView = page;
+						success();
 					}
-				} else { //Wenn keine Viewklasse vorhanden ist, die page als view nehmen
-					app.currentView = page;
-					success();
 				}
+				
+				Q($.mobile.changePage(pageContent, {changeHash: false, transition: transition, reverse: reverse})).done(function(){
+					if(!app.currentView){
+						//$('#pagecontainer').children().first().remove();
+						$('body').css('overflow', 'auto');
+						$("body").fadeIn(100);
+					}
+					app.currentView = page;
+					afterTransition();
+				});
 
 				return q.promise;
-				///OLD CODE
-				/*this.currentView = page;
-				var q = Q.defer();
-				if(this.locked) {
-					q.resolve();
-					return q.promise;
-				}
-				this.locked = true; //App für weitere Seitenaufruge sperren bis die Seite geladen und gewechselt wurde
-				var params = {};
-				if(typeof(transition) == 'object') { //Wenn die Transition ein Objekt ist, sind das zusätzliche Parameter für den View
-					params = transition;
-					transition = false;
-				}
-		
-				if(!transition)
-					transition = 'slide'; //Standardtransition
-		
-				var b = transition[0], back;
-				if(back = b == '-') { //Wenn das erste Zeichen im Transitionsname ein '-' ist, die Transition in engegengesetzte Richtung (<-) durchführen (Zum Hauptmenü z.B.)
-					transition = transition.substr(1);
-				}
-				if(window.backDetected) { //Wenn zurücknavigiert wurde Transition auch in engegengesetzte Richtung (<-) durchführen
-					back = true;
-					window.backDetected = false;
-				}
-				window.reverseTransition = back;
-				var self = this; var samePage = false;
-				var callback = function(d){
-					if($.mobile.activePage.data('appfunction') == c+'.'+a) {
-						$.mobile.activePage.data('appurl', url); //Dem aktuellen Seitencontainer die aktuelle URL zuweisen
-						app.locked = false; //App für Clicks freigeben
-						q.resolve(d);
-						samePage = true;
-					}
-					var vars = d ? (d.vars ? $.extend(true, {}, d.vars) :$.extend(true, {}, d)) : {}; //Params für den View, wenn vorhanden, in das Datenobjekt integrieren
-					$.extend(vars, params);
-		
-					var html = app.render(c+'.'+a, vars);  //View rendern
-					var $con = $('.ui-content', '#'+c+'-'+a); //SeitenContainer selektieren
-		
-					if(self.refreshing) {
-						$con.append(html); //Wenn die Seite durch einen Refresh geladen wird, gerenderten View an die Seite anhängen
-						self.callback(); //Und die Callback-Funktion ausführen
-					} else {
-						$con[0].innerHTML = html; //Gerenderten View in den DOM einfügen
-					}
-					$con.enhanceWithin(); //jQueryMobile Styling in Container aktualisieren
-					
-					self.refreshing = false;
-					if(samePage) { //Wenn die Seite nicht gewechselt werden muss
-						app.locked = false; //App für Clicks freigeben und raus
-						return;
-					}
-					//$.mobile.pageContainer.change will be needed in future versions, 'cause mobile.changePage will be deprecated
-					Q($.mobile.changePage('#'+c+'-'+a,{allowSamePageTransition:true,reloadPage:false,changeHash:true,transition:transition, reverse:back})) //Seitenübergang vollführen
-					.then(function(){
-						$.mobile.activePage.data('appurl', url); //Dem aktuellen Seitencontainer die aktuelle URL zuweisen
-						$.mobile.activePage.data('appfunction', c+'.'+a); //Dem aktuellen Seitencontainer den aktuellen Controllerfunktionsnamen zuweisen
-						$('a:hover').blur(); //Damit die Hover Class des gedrückten Buttons entfernt wird, Focus genrell clearen
-						app.locked = false; //App für Clicks freigeben und raus
-						q.resolve(d);
-					});
-				}
+			},
 			
-				if(url && url != null && typeof(url) == 'string') //Wenn die URL ein String ist, URL anfragen
-					app.get(url).done(callback);
-				else //Sonst url als Datenobjekt interpretieren und Callback mit URL als Daten ausführen
-					callback(url);
-				return q.promise;*/
+			checkAuth: function(name){
+				var isAuth = app.session.get('up.session.authenticated');
+				var path = Backbone.history.location.hash;
+				var needAuth = _.contains(app.requiresAuth, name);
+				var cancelAccess = _.contains(app.preventAccessWhenAuth, name);
+				if(needAuth && !isAuth){
+					// If user gets redirect to login because wanted to access
+					// to a route that requires login, save the path in session
+					// to redirect the user back to path after successful login
+					app.session.set('up.session.redirectFrom', path);
+					Backbone.history.navigate('main/options', { trigger : true });
+					return false;
+				}else if(isAuth && cancelAccess){
+					// User is authenticated and tries to go to login, register ...
+					// so redirect the user to home page
+					Backbone.history.navigate('', { trigger : true });
+					return false;
+				}else{
+					//No problem, handle the route!!
+					return true;
+				}
+			},
+			
+			saveScrollPosition: function() {
+				if (this.history.length > 0){
+					var name = this.history[this.history.length-1].name;
+					this.routesToScrollPositions[name] = $(window).scrollTop();
+				}
+			},
+	
+			prepareScrollPositionFor: function(route) {
+				var pos = 0;
+				if (this.routesToScrollPositions[route]) {
+					pos = this.routesToScrollPositions[route];
+					delete this.routesToScrollPositions[route]
+				}
+	
+				// We only have one active page because jQuery mobiles custom history is disabled
+				var activePage = $.mobile.navigate.history.getActive();
+				activePage.lastScroll = pos;
 			},
 			
 			/**
@@ -574,44 +558,11 @@ define([
 					var duration = 350, animating = 'footer';
 					window.footerAnimating = true;
 					var dir = window.reverseTransition ? 1 : -1; //Transitionsrichtung für Footeranimation ermitteln
-					if(footer.length > 0) { //Wenn die Seite einen Footer hat, anzeigen und animieren
-						/*
-						self.footer[0].style.display = 'block';
-						self.footer.animate({'left':0}, duration, function(){
-							window.footerAnimating = false;
-							self.updateLayout();
-						});*/
-					} else {  //Sonst Footer ausblenden
-						/*self.footer.animate({'left':(self.footer.width() * dir)+'px'}, duration, function(){
-							self.footer[0].style.display = 'none';
-							self.updateLayout();
-							window.footerAnimating = false;
-						});*/
-					}
-					//self.updateLayout(animating);
 				});
 				
 				$(document).on('click', 'a[data-rel="back"]', function(){ //Backbutton clicks auf zurücknavigieren mappen
 					window.history.back();
 				});
-		
-				$(document).on('click', 'a', function(e){ //Alle Link-Klicks abfangen für internes Backbone-Routing
-					var $this = $(this);
-					var href = $this.attr('href') || '';
-					var rel = $this.attr('rel') || false;
-					var target = $this.attr('target');
-					var mapRequest = !(href.indexOf('maps:') == -1 && href.indexOf('geo:') == -1);
-					if(href && href != '#' && href.indexOf('javascript:') == -1 && href.indexOf('http://') == -1 && href.indexOf('https://') == -1 && !mapRequest && rel != 'norout') {
-						$('.ui-btn-active', app.activePage()).removeClass('ui-btn-active');
-						$this.addClass('ui-btn-active');
-						self.route(href);
-					}
-					if((!target || target != '_system') && (!rel || rel != 'external')) {
-						e.preventDefault();
-					} else {
-
-					}
-				})
 			},
 			/*
 			* Momentan aktive Seite zurückgeben
@@ -680,18 +631,8 @@ define([
 						}
 					}
 					require(modules, function(){
-						/*for(var i in arguments)
-							window[classNames[i]] = arguments[i];*/
 						$(document).trigger('app:controllersLoaded');
 					});
-					
-					/*require(views, function(data){
-						for(var c in views) {
-							var id = that.getTemplateID(viewNames[c]);
-							$('body').append($("<script type='" + that.viewType + "' id='" + id + "'>" + arguments[c] + "</script>"));
-						}
-						$(document).trigger('app:controllersLoaded');
-					});*/
 				});
 			},
 			/*

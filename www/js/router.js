@@ -25,8 +25,10 @@ define([
 	'modules/grades',
 	'modules/impressum',
 	'modules/options',
-	'modules/people'
-], function($, _, Backbone, BaseRouter, Session, utils, HomePageView, NewsView, EventsView, CalendarPageView, MoodlePageView, EmergencyPageView, SitemapPageView, RoomPageView, OpeningPageView, TransportPageView, Transport2PageView, MensaPageView, LibraryPageView, LecturesPageView, GradesPageView, ImpressumPageView, OptionsPageView, PeoplePageView){
+	'modules/people',
+	'modules/calendar.export'
+], function($, _, Backbone, BaseRouter, Session, utils, customHistory, HomePageView, NewsView, EventsView, CalendarPageView, MoodlePageView, EmergencyPageView, SitemapPageView, RoomPageView, OpeningPageView, TransportPageView, Transport2PageView, MensaPageView, LibraryPageView, LecturesPageView, GradesPageView, ImpressumPageView, OptionsPageView, PeoplePageView, CalendarExportPageView){
+
 
 	var AppRouter = BaseRouter.extend({
 
@@ -39,8 +41,10 @@ define([
 			"events": "events",
 			"events/*id": "events",
 			"calendar": "calendar",
-			"calendar/*day": "calendar",
-			"study/moodle": "moodle",
+			"calendar/day/*day": "calendar",
+			"calendar/export": "calendarexport",
+			"moodle": "moodle",
+			"moodle/*courseid": "moodle",
 			"library": "library",
 			// Routes for Campus - Page
 			"sitemap": "sitemap",
@@ -71,13 +75,23 @@ define([
 		initialize: function(){
 			this.session = new Session;
 			this.listenTo(this, 'route', function(route, params){
-				this.history.push({name: route});
+				customHistory.push(this.serializeRoute(route, params));
 			});
+		},
+
+		serializeRoute: function(route, params) {
+			var result = route;
+			for (var count = 0; count < params.length; count++) {
+				if (params[count] != null) {
+					result += " " + params[count];
+				}
+			}
+			return result;
 		},
 
 		before: function(params, next, name){
 			this.saveScrollPosition();
-			this.prepareScrollPositionFor(name);
+			this.prepareScrollPositionFor(this.serializeRoute(name, params));
 
 			//Checking if user is authenticated or not
 			//then check the path if the path requires authentication
@@ -180,8 +194,12 @@ define([
 			this.changePage(new CalendarPageView({day: day}));
 		},
 
-		moodle: function () {
-			this.changePage(new MoodlePageView({model: this.session}));
+		calendarexport: function() {
+			this.changePage(new CalendarExportPageView());
+		},
+
+		moodle: function (courseid) {
+			this.changePage(new MoodlePageView({model: this.session, courseid: courseid}));
 		},
 
 		lectures: function(vvzUrls){

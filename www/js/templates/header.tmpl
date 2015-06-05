@@ -2,7 +2,7 @@
   <% if(back) { %>
   	<a data-rel="back" data-direction="reverse" data-transition="slidefade" class="ui-link back <%= backCaption ? 'back-caption ' : '' %>ui-btn-left ui-btn ui-btn-inline ui-shadow ui-corner-all" href="javascript:history.back()" data-role="button" role="button"><%= backCaption ? backCaption : 'Zurück' %></a>
   <% } else if(!home){ %>
-  <a href="#home" data-role="button" data-icon="false" data-inline="true" data-transition="slidefade" data-direction="reverse" class="ui-link ui-btn-left ui-btn ui-btn-inline ui-shadow ui-corner-all menubutton">Menue</a>
+  <a href="#main/menu" data-role="button" data-icon="false" data-inline="true" data-transition="slidefade" data-direction="reverse" class="ui-link ui-btn-left ui-btn ui-btn-inline ui-shadow ui-corner-all menubutton">Menue</a>
   <% } %>
   <% if(store.get('up.session.authenticated')){ %>
 	<h1 class="ui-title loggedin"><%=title%></h1>

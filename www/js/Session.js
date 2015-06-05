@@ -9,6 +9,7 @@ define([
 
         initialize: function(){
             //Check for localStorage support
+			console.log(this.request);
             if(Storage && localStorage){
               this.supportStorage = true;
             }
