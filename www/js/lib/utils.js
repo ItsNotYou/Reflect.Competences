@@ -408,7 +408,7 @@ define([
 			window.open(url, "_system");
 			e.preventDefault();
 			return false;
-		} else if(href && !isJavascript && rel != 'norout') {
+		} else if(href && !isJavascript && rel != 'norout' && href != '#') {
 			$this.addClass('ui-btn-active');
 			$('.ui-btn-active', app.activePage()).removeClass('ui-btn-active');
 			app.route(url);

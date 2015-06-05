@@ -1,16 +1,5 @@
 define(['jquery', 'underscore', 'backbone', 'utils', 'modules/campusmenu', 'modules/timeselection', 'underscore-string'], function($, _, Backbone, utils, campusmenu, timeselection){
 
-	$(document).on("pageinit", "#room", function () {
-		$("div[data-role='campusmenu']").campusmenu({ onChange: updateRoomData });
-		$("div[data-role='timeselection']").timeselection({ onChange: updateTimeData });
-	});
-
-	$(document).on("pageshow", "#room", function () {
-		$("div[data-role='campusmenu']").campusmenu("pageshow");
-		$("div[data-role='timeselection']").timeselection("pageshow");
-	});
-
-
 	function selector(li) {
 		var house = li.attr("data-house");
 		return "Haus " + house;
@@ -299,7 +288,10 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'modules/campusmenu', 'modu
 		render: function(){
 			this.$el = this.page;
 			this.$el.html(this.template({}));
-			
+			$("div[data-role='campusmenu']").campusmenu({ onChange: updateRoomData });
+			$("div[data-role='timeselection']").timeselection({ onChange: updateTimeData });
+			$("div[data-role='campusmenu']").campusmenu("pageshow");
+			$("div[data-role='timeselection']").timeselection("pageshow");
 			// Switch infotext header according to view state (collapsible expanded or collapsible collapsed)
 			this.$(".infotext-header-show").show();
 			this.$(".infotext-header-hide").hide();
