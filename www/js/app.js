@@ -344,6 +344,8 @@ define([
 								pageContent.addClass('ui-page-footer-fixed');
 							}
 						}
+						if(content.afterRender)
+							content.afterRender();
 					}
 					if(_.keys(response).length > 0)
 							q.resolve(response, content);

@@ -429,7 +429,14 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'q', 'modules/campusmenu', 
 			this.$el.html(this.template({}));
 			$("div[data-role='campusmenu']").campusmenu({ onChange: function(options) { oneSidedGuard.callMultiple(options); } });
 			$("div[data-role='campusmenu']").campusmenu("pageshow");
+			$('#sitemaps-settings').panel();
+			$('#sitemaps-settings').trigger('create');
 			return this;
+		},
+		afterRender: function(){
+			$('#header-settings-btn').click(function(){
+				$('#sitemaps-settings').panel("toggle");
+			});
 		},
 
 		searchSimilarLocations: function(id) {

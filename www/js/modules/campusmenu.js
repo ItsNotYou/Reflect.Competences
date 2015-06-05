@@ -10,11 +10,11 @@ define(['jquery', 'underscore', 'backbone', 'jquerymobile'], function($, _, Back
 			url = url[0]+'/'+url[1];
 			// create html code
 			this.element.append(
-				"<div data-role='navbar'> \
-                    <ul> \
-                        <li><a rel='norout' href='#"+url+"/griebnitzsee' class='location-menu location-menu-default'>Griebnitzsee</a></li> \
-                        <li><a rel='norout' href='#"+url+"/neuespalais' class='location-menu'>Neues Palais</a></li> \
-                        <li><a rel='norout' href='#"+url+"/golm' class='location-menu'>Golm</a></li> \
+				"<div class=\"ui-navbar\" data-role='navbar'> \
+                    <ul class=\"ui-grid-b\"> \
+                        <li class=\"ui-block-a\"><a rel='norout' href='#"+url+"/griebnitzsee' class='location-menu location-menu-default'>Griebnitzsee</a></li> \
+                        <li class=\"ui-block-b\"><a rel='norout' href='#"+url+"/neuespalais' class='location-menu'>Neues Palais</a></li> \
+                        <li class=\"ui-block-c\"><a rel='norout' href='#"+url+"/golm' class='location-menu'>Golm</a></li> \
                     </ul> \
                 </div>");
 			this.element.trigger("create");
