@@ -174,6 +174,42 @@ define([
 	}
 
 	/**
+	 * Takes a model or collection ("subject") and triggers an event if the subject doesn't have any sync processes running in the background.
+	 * This helps if you want to be sure that you don't work on previously cached data if a fetch for fresh data is still going on. The triggered event is named "fullysynced" and has the given subject as first parameter
+	 */
+	var FullySyncedAdapter = Backbone.Model.extend({
+
+		runningCounter: 0,
+
+		initialize: function(properties, options) {
+			this.subject = options.subject;
+
+			this.listenTo(this.subject, "request", this.spinnerOn);
+			this.listenTo(this.subject, "cachesync", this.spinnerHold)
+			this.listenTo(this.subject, "sync", this.spinnerOff);
+			this.listenTo(this.subject, "error", this.spinnerOff);
+		},
+
+		spinnerOn: function() {
+			this.runningCounter++;
+		},
+		
+		spinnerHold: function(model, attr, opts) {
+			// backbone-fetch-cache is used, we should be aware of prefill requests
+			if (opts.prefill) {
+				this.runningCounter++;
+			}
+		},
+
+		spinnerOff: function() {
+			this.runningCounter--;
+			if (this.runningCounter <= 0) {
+				this.trigger("fullysynced", this.subject);
+			}
+		}
+	});
+
+	/**
 	 * Loading View, that listens to a given model or collection.
 	 * As long as the model is loading data from the server, a loading spinner is shown on the given element.
 	 */
@@ -204,9 +240,11 @@ define([
 
 		spinnerOn: function() {
 			this.runningCounter++;
-			this.$el.append("<div class=\"up-loadingSpinner extensive-spinner\">" +
-								"<img src=\"img/loadingspinner.gif\"></img>" +
-							"</div>");
+			if (this.runningCounter == 1) {
+				this.$el.append("<div class=\"up-loadingSpinner extensive-spinner\">" +
+									"<img src=\"img/loadingspinner.gif\"></img>" +
+								"</div>");
+			}
 		},
 		
 		spinnerHold: function(model, attr, opts) {
@@ -461,6 +499,17 @@ define([
 		}
 	};
 
+	var defaultTransition = function() {
+		var device = window.device || {data: 'none'};
+		if (device.platform === "ios" || device.platform === "iOS") {
+			$.mobile.changePage.defaults.transition = "fade";
+		} else {
+			$.mobile.changePage.defaults.transition =  "slidefade";
+		}
+
+		return $.mobile.changePage.defaults.transition;
+	};
+
 	return {
 			rendertmpl: rendertmpl,
 			removeTabs: removeTabs,
@@ -475,6 +524,8 @@ define([
 			LocalStore: LocalStore,
 			GesturesView: GesturesView,
 			activateExtendedAjaxLogging: activateExtendedAjaxLogging,
-			cacheDefaults: cacheDefaults
+			cacheDefaults: cacheDefaults,
+			defaultTransition: defaultTransition,
+			FullySyncedAdapter: FullySyncedAdapter
 		};
 });

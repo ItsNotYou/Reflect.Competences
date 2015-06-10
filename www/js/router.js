@@ -27,8 +27,9 @@ define([
 	'modules/impressum',
 	'modules/options',
 	'modules/people',
-	'modules/tipp'
-], function($, _, Backbone, BaseRouter, Session, utils, customHistory, HomePageView, NewsView, EventsView, CalendarPageView, MoodlePageView, EmergencyPageView, SitemapPageView, RoomPageView, OpeningPageView, TransportPageView, Transport2PageView, MensaPageView, LibraryPageView, LecturesPageView, GradesPageView, ImpressumPageView, OptionsPageView, PeoplePageView, TippPageView){
+	'modules/tipp',
+	'modules/calendar.export'
+], function($, _, Backbone, BaseRouter, Session, utils, customHistory, HomePageView, NewsView, EventsView, CalendarPageView, MoodlePageView, EmergencyPageView, SitemapPageView, RoomPageView, OpeningPageView, TransportPageView, Transport2PageView, MensaPageView, LibraryPageView, LecturesPageView, GradesPageView, ImpressumPageView, OptionsPageView, PeoplePageView, CalendarExportPageView){
 
 	var AppRouter = BaseRouter.extend({
 
@@ -41,7 +42,8 @@ define([
 			"events": "events",
 			"events/*id": "events",
 			"calendar": "calendar",
-			"calendar/*day": "calendar",
+			"calendar/day/*day": "calendar",
+			"calendar/export": "calendarexport",
 			"moodle": "moodle",
 			"moodle/*courseid": "moodle",
 			"library": "library",
@@ -74,15 +76,25 @@ define([
 		initialize: function(){
 			this.session = new Session;
 			this.listenTo(this, 'route', function(route, params){
-				customHistory.push(route);
+				customHistory.push(this.serializeRoute(route, params));
 			});
 
 			customHistory.startTracking();
 		},
 
+		serializeRoute: function(route, params) {
+			var result = route;
+			for (var count = 0; count < params.length; count++) {
+				if (params[count] != null) {
+					result += " " + params[count];
+				}
+			}
+			return result;
+		},
+
 		before: function(params, next, name){
 			this.saveScrollPosition();
-			this.prepareScrollPositionFor(name);
+			this.prepareScrollPositionFor(this.serializeRoute(name, params));
 
 			//Checking if user is authenticated or not
 			//then check the path if the path requires authentication
@@ -182,6 +194,10 @@ define([
 
 		calendar: function(day){
 			this.changePage(new CalendarPageView({day: day}));
+		},
+
+		calendarexport: function() {
+			this.changePage(new CalendarExportPageView());
 		},
 
 		moodle: function (courseid) {
@@ -287,7 +303,7 @@ define([
 			$('body').css('overflow', 'hidden');
 			$('#pagecontainer').append(pageContent);
 
-			var transition = $.mobile.changePage.defaults.transition;
+			var transition = utils.defaultTransition();
 			var reverse = $.mobile.changePage.defaults.reverse;
 
 			// dont slide first page

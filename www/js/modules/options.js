@@ -25,19 +25,35 @@ define([
 
 		initialize: function(){
 			this.loginAttempts = 0;
+			this.loginCountdown = 0;
 			this.logintemplate = utils.rendertmpl('login');
 			this.logouttemplate = utils.rendertmpl('logout');
 
 			this.listenTo(this.model,'change', this.render);
-			this.listenTo(this, "errorHandler", this.errorHandler);
+			this.listenTo(this, 'errorHandler', this.errorHandler);
+			this.listenTo(this, 'missingConnection', this.missingInternetConnectionHandler);
+			this.listenToOnce(this, 'registerTimer', this.registerCountdownTimer);
+		},
+
+		stopListening: function() {
+			clearInterval(this.timer);
+			Backbone.View.prototype.stopListening.apply(this, arguments);
 		},
 
 		render: function(){
+			this.updateCountdown();
 			if (this.model.get('up.session.authenticated')){
 				this.$el.html(this.logouttemplate({}));
 			}else{
-				this.$el.html(this.logintemplate({}));
+				this.$el.html(this.logintemplate({countdown: this.formatCountdown(this.loginCountdown)}));
 			}
+
+			if(this.loginCountdown > 0){
+				this.$("#error3").css('display', 'block');
+			}else{
+				this.$("#error3").css('display', 'none');
+			}
+			new utils.LoadingView({model: this.model, el: this.$("#loadingSpinner")});
 
 			this.$el.trigger("create");
 			return this;
@@ -45,7 +61,10 @@ define([
 
 		login: function(ev){
 			ev.preventDefault();
-			if(this.loginAttempts < 3){
+			this.updateCountdown();
+
+			if(this.loginAttempts < 3 && this.loginCountdown == 0){
+						
 				var username = $('#username').val();
 				var password = $('#password').val();
 				
@@ -61,7 +80,7 @@ define([
 				$('#username').val(username);
 				
 				this.model.generateLoginURL({username: username, password: password});
-				if (!this.LoadingView) {this.LoadingView = new utils.LoadingView({model: this.model, el: this.$("#loadingSpinner")});}
+
 				var that = this;
 				this.model.fetch({
 					success: function(model, response, options){
@@ -76,6 +95,7 @@ define([
 							that.model.set('up.session.username', username);
             				that.model.set('up.session.password', password);
 							that.model.set('up.session.MoodleToken', response['token']);
+							that.model.unset('up.session.loginFailureTime');	//wenn login erfolgreich lösche failureTime
 
 							var path = '';
 							if(that.model.get('up.session.redirectFrom')){
@@ -89,12 +109,11 @@ define([
 					error: function(model, response, options){
 						console.log(response);
 						// render error view
-						that.trigger("errorHandler");
+						that.trigger("missingConnection");
 					}
 				});
 			}else{
-				this.$("#error3").css('display', 'block');
-				this.$('#login').attr('disabled', 'disabled');
+				this.render();
 			}
 		},
 
@@ -111,10 +130,52 @@ define([
 		errorHandler: function(){
 			this.loginAttempts++;
 			this.$("#error").css('display', 'block');
+			this.updateCountdown();
+		},
+
+		missingInternetConnectionHandler: function(){
+			this.$("#error0").css('display', 'block');
 		},
 
 		clearForm: function(){
 			this.$("#error").css('display', 'none');
+			this.$("#error0").css('display', 'none');
+		},
+
+		updateCountdown: function() {
+			if(this.loginAttempts>=3 && !this.model.get('up.session.loginFailureTime')){
+				this.model.set('up.session.loginFailureTime', new Date().getTime());
+				this.loginAttempts=0;
+
+				this.render();
+				return;
+			}
+
+			if(this.model.get('up.session.loginFailureTime')){
+				this.loginCountdown = parseInt(this.model.get('up.session.loginFailureTime'))+10*60*1000 - new Date().getTime();
+				if(this.loginCountdown < 0){
+					this.loginCountdown = 0;
+					this.model.unset('up.session.loginFailureTime');
+					clearInterval(this.timer);
+					this.listenToOnce(this, 'registerTimer', this.registerCountdownTimer);
+				}else{
+					this.trigger('registerTimer');
+				}
+			}
+		},
+
+		registerCountdownTimer: function() {
+			this.timer=setInterval(function() {
+				this.render();
+			}.bind(this), 1000);
+		},
+
+		formatCountdown: function(milsec){
+			var sec = Math.floor(milsec/1000);
+			var formatLeadingZeroes = function(value){ return value < 10 ? "0"+value : value; };
+			var min = formatLeadingZeroes(Math.floor(sec/60));
+			sec = formatLeadingZeroes(sec%60);
+			return min+":"+sec;
 		}
 
 	});
