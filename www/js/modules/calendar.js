@@ -35,7 +35,7 @@ define([
 
 	/**
 	 *	CalendarPageView - BackboneView
-	 * 	Main View fpr calendar
+	 * 	Main View for calendar
 	 */
 	app.views.CalendarIndex = utils.GesturesView.extend({
 
@@ -84,10 +84,9 @@ define([
 			var courseSlots = new calendar.CourseSlots(undefined, { courseList: this.CourseList, day: day });
 
 			new CalendarDayView({collection: courseSlots, el: this.$("#coursesForDay")});
-			new utils.LoadingView({collection: this.CourseList, el: this.$("#loadingSpinner")});
+			new utils.LoadingView({collection: this.CourseList, el: this.page.find("#loadingSpinner")});
 
 			this.CourseList.fetch({cache: true});
-			this.CourseList.trigger('request');
 		},
 
 		errorHandler: function(error){

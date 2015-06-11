@@ -327,7 +327,7 @@ define([
 		},
 
 		spinnerOn: function() {
-			console.log('Spinner');
+			console.log('SpinnerON');
 			this.runningCounter++;
 			if (this.runningCounter == 1) {
 				console.log(this.$el);
@@ -338,6 +338,7 @@ define([
 		},
 
 		spinnerOff: function() {
+			console.log('SpinnerOff');
 			this.$el.empty();
 		}
 	});
