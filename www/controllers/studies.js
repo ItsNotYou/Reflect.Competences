@@ -6,7 +6,8 @@ app.controllers.studies = BackboneMVC.Controller.extend({
 	modules: {
 		'calendar' : 'calendarView',
 		'lectures' : 'lecturesView',
-		'grades' : 'gradesView'
+		'grades' : 'gradesView',
+		'moodle' : 'moodleView'
 	},
 	/*
 	* Um Initialisierungsfunktionen auszuführen
@@ -41,6 +42,11 @@ app.controllers.studies = BackboneMVC.Controller.extend({
 	
 	grades:function(){
 		app.loadPage('grades', 'index');
+    },
+	
+	moodle:function(action, id){ //action ist immer index, bis jemand das ändern möchte
+		action =  'index';
+		app.loadPage('moodle', action, {model: app.session, courseid: id});
     },
 	
 });
