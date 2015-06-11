@@ -163,7 +163,6 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'date'], function($, _, Bac
 		initialize: function(p){
 			this.template = utils.rendertmpl('events.index');
 			this.collection = new app.models.Events(p);
-			console.log(p);
 			this.filter = p.filter;
 			_.bindAll(this, 'render', 'filterIndex');
 		},

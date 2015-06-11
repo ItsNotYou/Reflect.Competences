@@ -25,7 +25,7 @@ define([
 			c: {}, //Controller-Objekte werden in diesem Array abgelegt
 			controllers: {}, //Controllerklassen
 			controllerList: [ 
-				"controllers/main", 
+				"controllers/main",
 				"controllers/events", 
 				"controllers/news", 
 				"controllers/campus", //"Onepager" in einem Controller um platz zu sparen
@@ -105,7 +105,7 @@ define([
 						if (url && _.any(authUrls, isStartOf(url))) {
 							options.headers = _.extend(options.headers || {}, { "Authorization": utils.getAuthHeader() });
 						}
-						sync(method, model, options);
+						return sync(method, model, options);
 					};
 				}
 
@@ -124,7 +124,6 @@ define([
 				this.baseUrl = this.baseUrl.replace(/\/index\.html/, ''); //Anwendungsurl ermitteln
 				var that = this;
 				$(document).one('app:controllersLoaded', function(){ //Wird ausgeführt wenn alle Controller und Viewtemplates geladen wurden
-					that.updateLayout(); //Layout aktualisieren
 					that.bindEvents(); //Globale Events zuordnen
 					Backbone.history.start({pushState: false, root: that.baseUrl}); //Backbone URL-Routing-Funktion starten
 					if(!window.location.hash) { //Wenn keine URL übergeben wurde, das Hauptmenü aufrufen
@@ -251,6 +250,7 @@ define([
 				$pageContainer = $('#pagecontainer');
 				var $header = $pageContainer.find('.ui-header');
 				$pageContainer.append(pageContent);
+				$pageContainer.trigger("create");
 				if($header.length > 0) {
 					$header.replaceWith(header);
 				} else {
@@ -346,6 +346,7 @@ define([
 						}
 						if(content.afterRender)
 							content.afterRender();
+						$pageContainer.trigger("create");
 					}
 					if(_.keys(response).length > 0)
 							q.resolve(response, content);
@@ -361,7 +362,7 @@ define([
 					if(app.views[utils.capitalize(c) + utils.capitalize(a)]) { //Wenn eine View-Klasse für Content vorhanden ist: ausführen
 						app.currentView = {};
 						app.currentView = content = new app.views[utils.capitalize(c) + utils.capitalize(a)](params); //app.currentView kann als Referenz im HTML z.b. im onclick-Event verwendet werden
-						content.page = $(page.el);
+						content.page = page.$el;
 				
 						if((content.model || content.collection) && content.inCollection) { //Element aus der geladenen Collection holen und nicht vom Server
 							var parts = content.inCollection.split('.');
@@ -408,12 +409,14 @@ define([
 								if(app.cache[content.model.url]) { //Model in cache
 									success('cached', app.cache[content.model.url]);
 								} else if(content.model.url && typeof content.model.url != 'function') { //Model abrufbar von URL
-									content.model.fetch({
+									console.log(content.model);
+									content.model.fetch($.extend(utils.cacheDefaults(), {
 										success: success,
 										error: function(){
 										},
 										dataType: 'json'
-									});
+									}));
+									console.log('FF');
 								} else {
 									success();
 								}
@@ -495,37 +498,6 @@ define([
 				}
 				return q.promise;
 			},
-			/*
-			* Layout aktualsieren (Nach Resize, Orientation Changed, Initialisierung)
-			*/
-			updateLayout:function(){
-				/*
-				if(!this.header) { //Initialisierung der Variablen
-					this.body = $('#wrapper');
-					this.header = $('#the_header');
-					this.headerContent = $('#header-content');
-					this.footerContent = $('#footer-content');
-					this.footer = $('#the_footer');
-					this.footerHeight = this.footer.height();
-					this.layoutCSS = $('#layout-style-css');
-					var self = this;
-					$(window).resize(function(){ //Layout aktualisieren, wenn die Fenstergröße verändert wird
-						self.contentOuter = $('.ui-content').outerHeight() - $('.ui-content').height();
-						self.updateLayout();
-					});
-					if($.os.ios7) //Unter iOS7 dem Header oben mehr Platz geben, da die Menüleiste in die App "hineinragt"
-						this.header.addClass('ios7');
-					$(window).resize();
-					return;
-				}
-				var hheight = this.header.is(':visible') * this.header.outerHeight(true);
-				var fheight = (this.footer.is(':visible')) * this.footer.outerHeight(true);
-				if(window.footerAnimating) fheight = 1;
-				var height = this.body.height() - hheight - fheight - this.contentOuter + 3;
-				this.layoutCSS.html('.ui-content{height:'+height+'px !important;} .app-page{padding-top:'+(hheight - 1)+'px !important;}'); //Seiteninhaltscontainergröße festlegen
-				*/
-			},
-			
 			/**
 			* Globale Events setzen
 			*/

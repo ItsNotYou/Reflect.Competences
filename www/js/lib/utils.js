@@ -306,8 +306,9 @@ define([
 
 		initialize: function() {
 			var subject = this.findSubject();
+			this.runningCounter = 0;
 			if (subject){
-				console.log('Loading View working');
+				console.log('SPINNER WORKS: '+this.$el.length);
 				this.listenTo(subject, "request", this.spinnerOn);
 				this.listenTo(subject, "sync", this.spinnerOff);
 				this.listenTo(subject, "error", this.spinnerOff);
@@ -326,8 +327,10 @@ define([
 		},
 
 		spinnerOn: function() {
+			console.log('Spinner');
 			this.runningCounter++;
 			if (this.runningCounter == 1) {
+				console.log(this.$el);
 				this.$el.append("<div class=\"up-loadingSpinner extensive-spinner\">" +
 									"<img src=\"img/loadingspinner.gif\"></img>" +
 								"</div>");

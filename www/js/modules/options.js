@@ -117,9 +117,9 @@ define([
 							if(that.model.get('up.session.redirectFrom')){
 		                		var path = that.model.get('up.session.redirectFrom');
 		                		that.model.unset('up.session.redirectFrom');
-		                		Backbone.history.navigate(path, { trigger : true });
+		                		app.route(path);
 		            		}else{
-		                		Backbone.history.navigate('', { trigger : true });
+		                		app.route('');
 		            		}
 						}
 
@@ -139,9 +139,9 @@ define([
 			//this.updateCountdown();
 			this.logintemplate = utils.rendertmpl('login');
 			console.log(this.page)
-			this.page.find('#options').html(this.logintemplate({countdown: this.formatCountdown(this.loginCountdown)}));
+			this.setElement(this.page.find('#options'));
+			this.$el.html(this.logintemplate({countdown: this.formatCountdown(this.loginCountdown)}));
 			var _this = this;
-			$("#loginform").submit(function(e){_this.login(e)});
 			if(this.loginCountdown > 0){
 				this.$("#error3").css('display', 'block');
 			}else{
@@ -149,7 +149,6 @@ define([
 			}
 			new utils.LoadingView({model: this.model, el: this.$("#loadingSpinner")});
 
-			this.$el.trigger("create");
 			return this;
 		},
 	});
@@ -159,6 +158,9 @@ define([
 		events:{
 			'submit #logoutform': 'logout'
 		},
+		initialize: function(){
+			this.model = new Session();
+		},
 		
 		logout: function(ev){
 			ev.preventDefault();
@@ -166,16 +168,15 @@ define([
             this.model.unset('up.session.username');
             this.model.unset('up.session.password');
             this.model.unset('up.session.MoodleToken');
-			Backbone.history.navigate('', { trigger : true });
+			app.route('');
 		},
 		
 		render: function(){
 			this.logouttemplate = utils.rendertmpl('logout');
-			this.$el.html(this.logouttemplate({countdown: this.formatCountdown(this.loginCountdown)}));
+			this.setElement(this.page.find('#options'));
+			this.$el.html(this.logouttemplate({}));
 
 			new utils.LoadingView({model: this.model, el: this.$("#loadingSpinner")});
-
-			this.$el.trigger("create");
 			return this;
 		},
 	});

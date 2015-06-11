@@ -24,24 +24,20 @@ app.controllers.studies = BackboneMVC.Controller.extend({
     },
 
     lectures:function(vvzUrls){
+		var _this = this;
 		app.loadPage('lectures', 'index').done(function(){
-			
+			var vvzHistory = app.currentView.vvzHistory;
+			if (vvzUrls != undefined) {
+				vvzHistory.reset(JSON.parse(vvzUrls));
+			} else {
+				vvzHistory.reset();
+			}
+	
+			/*_this.listenTo(app.currentView, "openVvzUrl", function(vvzHistory) {
+				var param = JSON.stringify(vvzHistory.toJSON());
+				var url = "studies/lectures/" + encodeURIComponent(param)
+			});*/
 		});
-		var vvzHistory = app.currentView.vvzHistory;
-		if (vvzUrls != undefined) {
-			vvzHistory.reset(JSON.parse(vvzUrls));
-		} else {
-			vvzHistory.reset();
-		}
-
-		this.listenTo(app.currentView, "openVvzUrl", function(vvzHistory) {
-			var param = JSON.stringify(vvzHistory.toJSON());
-			var url = "studies/lectures/" + encodeURIComponent(param)
-			//this.navigate(url);
-			alert(1);
-			//customHistory.push(url);
-		});
-		
     },
 	
 	grades:function(){

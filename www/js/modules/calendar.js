@@ -80,12 +80,14 @@ define([
 		},
 
 		prepareCourses: function(){
+			console.log('PREPARE');
 			var courseSlots = new calendar.CourseSlots(undefined, { courseList: this.CourseList, day: day });
 
 			new CalendarDayView({collection: courseSlots, el: this.$("#coursesForDay")});
 			new utils.LoadingView({collection: this.CourseList, el: this.$("#loadingSpinner")});
 
 			this.CourseList.fetch({cache: true});
+			this.CourseList.trigger('request');
 		},
 
 		errorHandler: function(error){
@@ -93,6 +95,7 @@ define([
 		},
 
 		render: function(){
+			console.log('RENDER');
 			this.$el.html(this.template({day: this.day}));
 			this.page.html(this.$el);
 			this.$el.trigger("create");

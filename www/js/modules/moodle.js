@@ -174,6 +174,7 @@ define([
         this.template = utils.rendertmpl('moodle');
         this.listenToOnce(this, "authorize", this.authorize);
         this.listenToOnce(this, "fetchContent", this.fetchContent);
+		_.bindAll(this, "selectCourse");
     },
 
     authorize: function(){
@@ -223,23 +224,26 @@ define([
                 });
             });
             that.LoadingView.spinnerOff();
+			console.log(MoodleApp.courses);
+			console.log(MoodleApp.courses.get(that.p.courseid));
+			if(that.p.courseid)
+				that.selectCourse(that.p.courseid);	
          });
     },
 
     render: function(){
+		this.page.html(this.$el);
         this.$el.html(this.template({}));
         this.courselist = this.$el.find('courselist');
         $(this.el).trigger("create");
         this.trigger("authorize");
+		console.log(this.p);
+		var _this = this;
         return this;
     },
 
-    selectCourse: function(ev) {
-        ev.preventDefault();
-        // get selected course
-        var courseid = $(ev.target).closest('li').attr('courseid');
+    selectCourse: function(courseid) {
         var course = MoodleApp.courses.get(courseid);
-
         // render course
         var courseView = new MoodleApp.CourseView({
             model: course,

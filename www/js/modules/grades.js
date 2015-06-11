@@ -32,6 +32,7 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'Session'], function($, _, 
 	var GradeAveragesView = Backbone.View.extend({
 
 		initialize: function() {
+			
 			this.template = utils.rendertmpl("gradeAverages");
 			this.listenTo(this.model, "sync", this.render);
 		},
@@ -54,9 +55,9 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'Session'], function($, _, 
 
 		initialize: function(){
 			this.template = utils.rendertmpl('grades');
-			this.listenToOnce(this, "render", this.prepareGrade);
-			this.grades = new Grades();
-			this.listenTo(this.grades, "error", this.requestFail);
+			
+			this.model = new Grades();
+			this.listenTo(this.model, "error", this.requestFail);
 			_.bindAll(this, 'render', 'requestFail', 'prepareGrade');
 		},
 
@@ -65,18 +66,18 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'Session'], function($, _, 
 		},
 
 		prepareGrade: function() {
-			new GradesView({model: this.grades, el: this.$("#gradesTable")});
-			new GradeAveragesView({model: this.grades, el: this.$("#averageData")});
-			new utils.LoadingView({model: this.grades, el: this.$("#loadingSpinner")});
-
-			this.grades.fetch(utils.cacheDefaults());
+			new GradesView({model: this.model, el: this.$("#gradesTable")});
+			new GradeAveragesView({model: this.model, el: this.$("#averageData")});
+			new utils.LoadingView({model: this.model, el: this.$("#loadingSpinner")});
+			this.model.fetch(utils.cacheDefaults());
 		},
 
 		render: function(){
-			$(this.el).html(this.template({}));
+			this.$el.html(this.template({}));
 			this.page.html(this.$el);
-			$(this.el).trigger("create");
+			this.$el.trigger("create");
 			this.trigger("render");
+			this.prepareGrade();
 			return this;
 		}
 	});
