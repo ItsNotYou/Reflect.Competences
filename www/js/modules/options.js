@@ -20,9 +20,10 @@ define([
 			this.loginCountdown = 0;
 			_.bindAll(this, 'render', 'updateCountdown');
 			//this.page = p.page;
-			//this.listenTo(this.model,'change', this.render);
-			//this.listenTo(this, "errorHandler", this.errorHandler);
-			//this.listenToOnce(this, 'registerTimer', this.registerCountdownTimer);
+			this.listenTo(this.model,'change', this.render);
+			this.listenTo(this, 'errorHandler', this.errorHandler);
+			this.listenTo(this, 'missingConnection', this.missingInternetConnectionHandler);
+			this.listenToOnce(this, 'registerTimer', this.registerCountdownTimer);
 		},
 		errorHandler: function(){
 			this.loginAttempts++;
@@ -32,6 +33,8 @@ define([
 
 		clearForm: function(){
 			this.$("#error").css('display', 'none');
+			this.$("#error0").css('display', 'none');
+			
 		},
 
 		stopListening: function() {
@@ -75,7 +78,6 @@ define([
 			}
 		},
 		login: function(ev){
-			alert(44);
 			ev.preventDefault();
 			console.log(this);
 			this.updateCountdown();
@@ -127,7 +129,7 @@ define([
 					error: function(model, response, options){
 						console.log(response);
 						// render error view
-						that.trigger("errorHandler");
+						that.trigger("missingConnection");
 					}
 				});
 			}else{
@@ -136,7 +138,7 @@ define([
 		},
 		
 		render: function(){
-			//this.updateCountdown();
+			this.updateCountdown();
 			this.logintemplate = utils.rendertmpl('login');
 			console.log(this.page)
 			this.setElement(this.page.find('#options'));
@@ -179,6 +181,9 @@ define([
 			new utils.LoadingView({model: this.model, el: this.$("#loadingSpinner")});
 			return this;
 		},
+		missingInternetConnectionHandler: function(){
+			this.$("#error0").css('display', 'block');
+		}
 	});
 	/**
 	 *	BackboneView - OptionsPageView

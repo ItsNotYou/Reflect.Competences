@@ -92,7 +92,7 @@ body .ui-group-theme-a .ui-btn:visited,
 	}
 }
 */
-#error,#error3 {
+#error,#error3, #error0 {
 	padding: .5em;
 	background: #ff9999;
 	border: 1px solid red;
@@ -2168,11 +2168,11 @@ p.event-description {
 		background-size: 25px 25px;
 	}
 	.mail {
-		background-image: url(../img/up/mail-small^_hr.png) !important;
+		background-image: url(../img/up/mail-small^_hr.png);
 		background-size: 20px 11px;
 	}
 	.phone {
-		background-image: url(../img/up/phone-small_hr.png) !important;
+		background-image: url(../img/up/phone-small_hr.png);
 		background-size: 20px 11px;
 	}
 	#libraryContent li.ui-state-active:after {
