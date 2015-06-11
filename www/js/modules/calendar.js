@@ -84,7 +84,7 @@ define([
 			var courseSlots = new calendar.CourseSlots(undefined, { courseList: this.CourseList, day: day });
 
 			new CalendarDayView({collection: courseSlots, el: this.$("#coursesForDay")});
-			new utils.LoadingView({collection: this.CourseList, el: this.page.find("#loadingSpinner")});
+			new utils.LoadingView({collection: this.CourseList, el: this.$("#loadingSpinner")});
 
 			this.CourseList.fetch({cache: true});
 		},

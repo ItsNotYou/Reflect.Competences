@@ -338,6 +338,7 @@ define([
 		},
 
 		spinnerOff: function() {
+			this.runningCounter--;
 			console.log('SpinnerOff');
 			this.$el.empty();
 		}

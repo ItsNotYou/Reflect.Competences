@@ -8,70 +8,70 @@ define([
         'Session'
 ], function( $, _, Backbone, utils, moodleAPI, moodleUtils, Session) {
 
-  "use strict";
+    "use strict";
 
-  window.MoodleApp = {};
+    window.MoodleApp = {};
 
-  // TODO: Refactor this code with use of Backbone fetch method
-  MoodleApp.Course = Backbone.Model.extend({
-    fetchContents: function(){
-      // Contents is a Collection
-      // console.log("TODO: fetchContents: is this correct? I'm not sure about it.");
-      var contents = new MoodleApp.CourseContents({courseid: this.id});
-      this.set('contents', contents);
-      return contents.fetch();
-    },
-  });
+    // TODO: Refactor this code with use of Backbone fetch method
+    MoodleApp.Course = Backbone.Model.extend({
 
-  MoodleApp.CourseContent = Backbone.Model.extend({});
+        fetchContents: function(){
+            // Contents is a Collection
+            var contents = new MoodleApp.CourseContents({courseid: this.id});
+            this.set('contents', contents);
+            return contents.fetch();
+        }
+    });
+
+    MoodleApp.CourseContent = Backbone.Model.extend({});
 
 
-  /**
-   *  Backbone Collection - Moodle CourseContents
-   *  for holding the whole course content
-   */
-  MoodleApp.CourseContents = Backbone.Collection.extend({
+    /**
+    *  Backbone Collection - Moodle CourseContents
+    *  for holding the whole course content
+    */
+    MoodleApp.CourseContents = Backbone.Collection.extend({
 
-    model: MoodleApp.CourseContent,
+        model: MoodleApp.CourseContent,
 
-    initialize: function(options){
-      this.courseid = options.courseid;
-    },
+        initialize: function(options){
+          this.courseid = options.courseid;
+        },
 
-    fetch: function(){
-      // console.log('fetch CourseContents', arguments);
-      var collection = this;
-      moodleAPI.api.core_course_get_contents({courseid: this.courseid})
-        .then(function(contents){
-          var token = moodleAPI.api.token();
-          if (contents.errorcode != 'invalidresponse'){
-            return moodleUtils.fixPluginfileForCourseContents(token, contents);
-          }
-        })
-        .done(function(contents){
-          collection.reset(contents);
-        });
-      return this;
-    }
-  });
+        fetch: function(){
+            var collection = this;
+            collection.isLoading = true;
+            moodleAPI.api.core_course_get_contents({courseid: this.courseid}).then(function(contents){
+                var token = moodleAPI.api.token();
+
+                if (contents.errorcode != 'invalidresponse'){
+                    return moodleUtils.fixPluginfileForCourseContents(token, contents);
+                }else{
+                    return contents;
+                }
+            }).done(function(contents){
+            	collection.isLoading = false;
+                collection.reset(contents);
+            });
+
+            return this;
+        }
+    });
 
   /**
    *  Backbone Collection - Moodle CourseList
    *  displays all courses in the starting list
    */
   MoodleApp.CourseList = Backbone.Collection.extend({
-
     model: MoodleApp.Course,
-
     comparator: 'fullname',
 
     fetch: function(){
-      var collection = this;
-      moodleAPI.api.moodle_enrol_get_users_courses()
-        .done(function(content){
-          collection.reset(content);
+        var collection = this;
+        moodleAPI.api.moodle_enrol_get_users_courses().done(function(content){
+            collection.reset(content);
         });
-      return this;
+        return this;
     }
   });
 
@@ -80,6 +80,7 @@ define([
    *  for displaying all news (still not productive)
    */
   MoodleApp.NewsList = Backbone.Collection.extend({
+
     fetch: function() {
       var collection = this;
       moodleAPI.news_api.webservice_get_latest_coursenews()
@@ -115,6 +116,7 @@ define([
         this.template = utils.rendertmpl('moodle_course_list_view');
         this.courses.on('reset', this.render, this);
         //this.news.on('reset', this.render, this);
+        this.render();
     },
 
     render: function(){
@@ -125,147 +127,157 @@ define([
   });
 
 
-  /**
-   *  Backbone View - CourseView
-   *  view for single courses
-   */
-  MoodleApp.CourseView = Backbone.View.extend({
+    /**
+    *  Backbone View - CourseView
+    *  view for single courses
+    */
+    MoodleApp.CourseView = Backbone.View.extend({
+
+        initialize: function(options){
+            this.news = options.news;
+            this.template = utils.rendertmpl('moodle_course_contents_page');
+
+            this.model.on('change', this.render, this);
+            this.collection.on('change', this.render, this);
+            this.collection.on('reset', this.render, this);
+            //this.news.on('change', this.render, this);
+        },
+
+        render: function(){
+            //console.log('render CourseContentsPage', this.el, this.model, this.collection);
+            var data = {
+                course:this.model,
+                contents: this.collection,
+                //news: this.news.get(this.model.id)
+            };
+            this.$el.html(this.template(data));
+            if (this.collection.models[0].get('errorcode')){
+                var errorPage = new utils.ErrorView({el: '#loadingSpinner', msg: 'Fehler beim Abruf des Kurses. Bitte greifen Sie direkt auf den Kurs mit obigen Link zu.', module: 'moodle'});
+            }
+
+            if(!this.LoadingView){
+                this.LoadingView = new utils.LoadingView({collection: this.collection, el: this.$("#loadingSpinner")});
+            }
+            
+            if (this.collection.isLoading){
+            	this.LoadingView.spinnerOn();
+            }else{
+                this.LoadingView.spinnerOff();
+            }
+
+            this.$el.trigger('create');
+            return this;
+        }
+    });
 
 
+    /**
+    * Backbone View - MoodlePage
+    * Startview for Moodle
+    */
+    app.views.MoodleIndex = Backbone.View.extend({
+        attributes: {"id": "moodle"},
+        model: Session,
 
-    initialize: function(options){
-      this.news = options.news;
-      this.template = utils.rendertmpl('moodle_course_contents_page');
+        initialize: function(options){
+            this.courseid = options.courseid;
+            this.listenToOnce(this, "authorize", this.authorize);
+            this.listenToOnce(this, "fetchContent", this.fetchContent);
+            this.listenTo(this, "renderView", this.renderView);
+            this.listenTo(this, "renderCourseList", this.renderCourseList);
+            if (!MoodleApp.courses){
+                // authoize and fetch
+                this.trigger("authorize");
+              }
+        },
 
-      this.model.on('change', this.render, this);
-      this.collection.on('change', this.render, this);
-      this.collection.on('reset', this.render, this);
-      //this.news.on('change', this.render, this);
-    },
+        authorize: function(){
 
-    render: function(){
-      // console.log('render CourseContentsPage', this.el, this.model, this.collection);
-      var data = {
-        course:this.model,
-        contents: this.collection,
-        //news: this.news.get(this.model.id)
-      };
-      this.$el.html(this.template(data));
-      this.$el.trigger('create');
-      return this;
-    }
-  });
+            //moodleAPI.news_api.set(credentials);
+            var that = this;
+            $.when(moodleAPI.api.fetchUserid()).done(function(){
+                // moodleAPI.api should be authorized and has userId, moodleAPI.news_api should be authorized
+                that.trigger("fetchContent");
+            }).fail(function(error){
+                var errorPage = new utils.ErrorView({el: '#courselist', msg: 'Fehler beim Abruf der Kurse. Bitte loggen Sie sich erneut ein.', module: 'moodle', err: error});
+            });
+        },
 
-	console.log(Session);
-  /**
-   * Backbone View - MoodlePage
-   * Startview for Moodle
-   */
-  app.views.MoodleIndex = Backbone.View.extend({
-    attributes: {"id": "moodle"},
-    model: Session,
+        fetchContent: function(){
+            MoodleApp.courses = new MoodleApp.CourseList();
+            //MoodleApp.news = new MoodleApp.NewsList();
+            //$.when(MoodleApp.courses.fetch(), MoodleApp.news.fetch())
 
-    events: {
-        'click .moodle-course': 'selectCourse',
-        'click .backbutton': 'back'
-    },
+            this.LoadingView = new utils.LoadingView({collection: MoodleApp.courses, el: this.$("#loadingSpinner")});
+            this.LoadingView.spinnerOn();
 
-    initialize: function(p){
-        this.template = utils.rendertmpl('moodle');
-        this.listenToOnce(this, "authorize", this.authorize);
-        this.listenToOnce(this, "fetchContent", this.fetchContent);
-		_.bindAll(this, "selectCourse");
-    },
+            // fetch all necessary information
+            MoodleApp.courses.fetch();
+            MoodleApp.courses.bind("reset", this.renderView, this)
+        },
 
-    authorize: function(){
-      // Moodle API isn't fetching so manuell adding of loading spinner
-      this.LoadingView = new utils.LoadingView({el: this.$("#loadingSpinner")});
-      this.LoadingView.spinnerOn();
+        renderView: function(){
+            if(this.courseid){
+                this.renderCourseView();
+            }else{
+                this.renderCourseList();
+            }
+        },
 
-      //moodleAPI.news_api.set(credentials);
-      var that = this;
-      $.when(
-          moodleAPI.api.fetchUserid()
-          //moodleAPI.news_api.authorize()
-        ).done(function(){
-            // moodleAPI.api should be authorized and has userId, moodleAPI.news_api should be authorized
-            that.trigger("fetchContent");
-        }).fail(function(error){
-            var errorPage = new utils.ErrorView({el: '#courselist', msg: 'Fehler beim Abruf der Kurse. Bitte loggen Sie sich erneut ein.', module: 'moodle', err: error});
-        });
-    },
+        renderCourseView: function(){
+            if (MoodleApp.courses.get(this.courseid)){
+                var course = MoodleApp.courses.get(this.courseid);
+                // render course
+                this.courseView = new MoodleApp.CourseView({
+                    model: course,
+                    collection: course.get('contents') || course.fetchContents(),
+                    //news: MoodleApp.news,
+                });
+                this.$el.html(this.courseView.render().el);
+            }else{
+                this.template = utils.rendertmpl('moodle');
+                this.$el.html(this.template({}));
+                var errorPage = new utils.ErrorView({el: '#courselist', msg: 'Dieser Kurs existiert nicht oder Sie sind nicht eingeschrieben.', module: 'moodle'});
+            }
 
-    fetchContent: function(){
-        var that = this;
-        // fetch all necessary information
-        MoodleApp.courses = new MoodleApp.CourseList();
-        //MoodleApp.news = new MoodleApp.NewsList();
-        //$.when(MoodleApp.courses.fetch(), MoodleApp.news.fetch())
+            this.$el.trigger("create");
+            return this;
+        },
 
-        $.when(MoodleApp.courses.fetch())
-         .then(function(){
-
+        renderCourseList: function(){
+            if (this.LoadingView){
+                this.LoadingView.spinnerOff();
+            }
             MoodleApp.listview = new MoodleApp.CourseListView({
-                el: that.$('ul#moodle_courses'),
+                el: this.$('ul#moodle_courses'),
                 courses: MoodleApp.courses
                 //news: MoodleApp.news
             });
 
             MoodleApp.courses.on('add', function(course){
-                // console.log('add', arguments);
                 course.fetchContents();
             });
+        },
 
-            MoodleApp.courses.on('reset', function(collection){
-                // console.log('reset', arguments);
-                collection.each(function(course){
-                    // console.log('fetch contents for course', course);
-                    course.fetchContents();
-                });
-            });
-            that.LoadingView.spinnerOff();
-			console.log(MoodleApp.courses);
-			console.log(MoodleApp.courses.get(that.p.courseid));
-			if(that.p.courseid)
-				that.selectCourse(that.p.courseid);	
-         });
-    },
-
-    render: function(){
-		this.page.html(this.$el);
-        this.$el.html(this.template({}));
-        this.courselist = this.$el.find('courselist');
-        $(this.el).trigger("create");
-        this.trigger("authorize");
-		console.log(this.p);
-		var _this = this;
-        return this;
-    },
-
-    selectCourse: function(courseid) {
-        var course = MoodleApp.courses.get(courseid);
-        // render course
-        var courseView = new MoodleApp.CourseView({
-            model: course,
-            collection: course.get('contents') || course.fetchContents(),
-            news: MoodleApp.news,
-        });
-
-        this.$el.html(courseView.render().el);
-        this.$el.trigger('create');
-        return this;
-    },
-
-    back: function(ev){
-        ev.preventDefault();
-
-        this.render();
-        $('ul#moodle_courses').html(MoodleApp.listview.render().el)
-        this.$el.trigger('create');
-        return this;
-    }
-  });
-
-  return app.views;
+        render: function(){
+            if (this.courseid){
+                if(MoodleApp.courses){
+                    this.renderCourseView();
+					 this.page.html(this.el);
+                }
+            }else{
+              this.template = utils.rendertmpl('moodle');
+			  //this.setElement(this.page);
+              this.$el.html(this.template({}));
+			  this.page.html(this.el);
+              if(MoodleApp.courses){
+                this.renderCourseList();
+              }
+            }
+			
+            this.$el.trigger("create");
+            return this;
+        }
+    });
 
 });

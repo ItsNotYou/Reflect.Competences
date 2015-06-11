@@ -6,8 +6,7 @@ app.controllers.studies = BackboneMVC.Controller.extend({
 	modules: {
 		'calendar' : 'calendarView',
 		'lectures' : 'lecturesView',
-		'grades' : 'gradesView',
-		'moodle' : 'moodleView'
+		'grades' : 'gradesView'
 	},
 	/*
 	* Um Initialisierungsfunktionen auszuführen
@@ -16,7 +15,7 @@ app.controllers.studies = BackboneMVC.Controller.extend({
     },
 	
 	default:function(){
-		this.index();
+		
 	},
 	
 	calendar:function(day){
@@ -38,15 +37,10 @@ app.controllers.studies = BackboneMVC.Controller.extend({
 				var url = "studies/lectures/" + encodeURIComponent(param)
 			});*/
 		});
-    },
+    },	
 	
 	grades:function(){
 		app.loadPage('grades', 'index');
-    },
-	
-	
-	moodle:function(courseid){
-		app.loadPage('moodle', 'index', {model: app.session, courseid: courseid});
     },
 	
 });

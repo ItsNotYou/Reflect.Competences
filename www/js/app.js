@@ -29,7 +29,8 @@ define([
 				"controllers/events", 
 				"controllers/news", 
 				"controllers/campus", //"Onepager" in einem Controller um platz zu sparen
-				"controllers/studies" //"Onepager" in einem Controller um platz zu sparen
+				"controllers/studies", //"Onepager" in einem Controller um platz zu sparen
+				"controllers/moodle", 
 			], //In der app vorhandene Controller
 			viewType:"text/x-underscore-template", //Templateenginekennung (Underscore)
 			requests : [], //Speichert die Rückgabe für jede URL (Cache)
