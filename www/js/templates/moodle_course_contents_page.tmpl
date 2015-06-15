@@ -1,7 +1,7 @@
-<meta name="title" content="Moodle" />
+<meta name="title" content="Kurs: <%= course.get('shortname') %>" />
 <meta name="back" content="1" />
 
-<div data-role="content" data-theme="b">
+<div data-role="content" data-theme="b" class="ui-content ui-body-b">
 	<div id="<%= course.get('id') %>">
 		<h3 class="coursetitle"><%= course.get('fullname') %></h3>
 		<div data-role="listview" data-inset="true" data-theme="b">
@@ -21,10 +21,10 @@
 					<ul>
 						<% _.each(c.get('modules'), function(m){ %>
 						<li>
-							<a href="<%= m.url %>" target="_blank" rel="external">
+							<% if(m.url) { %><a href="<%= m.url %>" target="_blank" rel="external"> <% } %>
 								<img src="<%= m.modicon %>" alt="<%= m.modname %>" />
 								<%= m.name %>
-							</a>
+							<% if(m.url) { %></a><% } %>
 						</li>
 						<% }); %>
 					</ul>
@@ -35,5 +35,6 @@
 			<% }); %>
 		</div>
 	</div>
+	<div id="loadingSpinner"></div>
 </div>
 <!-- End Content -->

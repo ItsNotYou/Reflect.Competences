@@ -210,7 +210,8 @@ define([
 				/*if(!this.currentView){
 					$('#pagecontainer').children().first().remove();
 				}*/
-				console.log(app.views);
+				if(!params)
+					params = {};
 				var pageName = utils.capitalize(c) + 'Page';
 				if(!app.views[pageName]) {
 					console.log('NOT');
@@ -358,9 +359,13 @@ define([
 				* Wird nach Pagetransition ausgeführt
 				*/
 				var afterTransition = function(){
-					//console.log(app.views);
+					console.log('DD');
+					console.log(app.views);
+					console.log(utils.capitalize(c) + utils.capitalize(a));
 					if(app.views[utils.capitalize(c) + utils.capitalize(a)]) { //Wenn eine View-Klasse für Content vorhanden ist: ausführen
 						app.currentView = {};
+						console.log('dd');
+						params.page = page.$el;
 						app.currentView = content = new app.views[utils.capitalize(c) + utils.capitalize(a)](params); //app.currentView kann als Referenz im HTML z.b. im onclick-Event verwendet werden
 						content.page = page.$el;
 				

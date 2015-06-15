@@ -338,9 +338,11 @@ define([
 		},
 
 		spinnerOff: function() {
-			this.runningCounter--;
-			console.log('SpinnerOff');
-			this.$el.empty();
+			this.runningCounter = this.runningCounter == 0 ? 0 : this.runningCounter - 1;
+			if(this.runningCounter == 0) {
+				this.$el.empty();
+			}
+			console.log('SpinnerOff - ' + this.runningCounter);
 		}
 	});
 	
@@ -405,9 +407,17 @@ define([
 		// In the browser, we let the browser handle everything
 		if (/*window.cordova && */isInternalProtocol) {
 			console.log("Opening " + uri + " in new tab");
-			openInTab(url);
-			e.preventDefault();
-			return false;
+			if(window.cordova) {
+				openInTab(url);
+				e.preventDefault();
+				return false;
+			} else {
+				if(target != '_blank') {
+					var openWindow = window.open(url, "_blank", "enableViewportScale=yes");
+					e.preventDefault();
+					return false;
+				}
+			}
 		} else if (window.cordova && hasProtocol && !isInternalProtocol && !isJavascript) {
 			console.log("Opening " + uri + " in system");
 			window.open(url, "_system");

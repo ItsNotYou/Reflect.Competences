@@ -53,12 +53,14 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'Session'], function($, _, 
 
 		attributes: {"id": "grades"},
 
-		initialize: function(){
+		initialize: function(p){
+			this.page = p.page;
 			this.template = utils.rendertmpl('grades');
 			
 			this.model = new Grades();
 			this.listenTo(this.model, "error", this.requestFail);
 			_.bindAll(this, 'render', 'requestFail', 'prepareGrade');
+			this.render();
 		},
 
 		requestFail: function(error) {
@@ -78,6 +80,17 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'Session'], function($, _, 
 			this.$el.trigger("create");
 			this.trigger("render");
 			this.prepareGrade();
+			return this;
+		}
+	});
+	
+	app.views.GradesPage = Backbone.View.extend({
+		initialize: function(){
+			this.template = utils.rendertmpl('grades');
+		},
+
+		render: function(){
+			this.$el.html(this.template({}));
 			return this;
 		}
 	});
