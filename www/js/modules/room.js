@@ -85,6 +85,8 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'modules/campusmenu', 'modu
 		model: function(attrs, options) {
 			attrs.startTime = new Date(attrs.startTime);
 			attrs.endTime = new Date(attrs.endTime);
+			attrs.startMoment = moment(attrs.startTime);
+			attrs.endMoment = moment(attrs.endTime);
 			attrs.title = attrs.veranstaltung;
 			return new Backbone.Model(_.omit(attrs, "veranstaltung"));
 		},
@@ -233,6 +235,7 @@ define(['jquery', 'underscore', 'backbone', 'utils', 'modules/campusmenu', 'modu
 			host.empty();
 
 			var reservations = this.model.reservations.map(function(d) { return d.attributes; });
+			reservations = _.sortBy(reservations, "startMoment");
 
 			// Create and add html
 			var createDetails = utils.rendertmpl('roomDetails');
