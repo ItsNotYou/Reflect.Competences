@@ -4,7 +4,7 @@ require.config({
     //waitSeconds: 10,
     paths: {
     	'templates': '../templates',
-    	'controllers': '../controllers',
+    	'controllers': 'controllers',
     	'jquery': 'vendor/jquery.min',
         'jquerymobile-config': 'jqm-config',
     	'jquerymobile': 'vendor/jquery.mobile.min',
