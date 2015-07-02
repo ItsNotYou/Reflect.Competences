@@ -1,40 +1,12 @@
-Mobile.UP
+Reflect.Competences
 ======
 
-Verfügbar für [Android](https://play.google.com/store/apps/details?id=de.floriangoessler.upapp).
+Entstanden im Rahmen der Veranstaltung [E-Learning](http://apache.cs.uni-potsdam.de/de/profs/ifi/mm/lehre).
 
-Die ganze Uni in deiner Hand: Finde dich auf dem Campus zurecht, habe immer den aktuellsten Speiseplan der Mensen dabei, hole dir Infos aus dem Vorlesungsverzeichnis, schau in deinen Stundenplan, checke deine Leistungen und vieles mehr!
-Features:
+## Quelle
 
-- aktueller Mensaplan
-- deinen Stundenplan direkt aktuell aus PULS
-- deine bisherigen Leistungen direkt aus PULS
-- das gesamte Vorlesungsverzeichnis 
-- aktuelle News von AStA, Uni und Co.
-- aktuelle Veranstaltungen von Nil, Waschhaus und Co.
-- durchsuchbare Öffnungszeiten für Büros, Sekretariate, Bibliotheken, Mensa und mehr
-- durchsuchbare Karten der Campusse
-- Zugriff auf Moodle2 ohne erneuten Login
-- freie Räume auf den Campussen
-- Bus und Bahn von, zu und zwischen den Campussen
-- Notrufnummern direkt zur Hand
-- Bibliothekssuche
-- direkter Link zum Hochschulsport
-
-Mobile.UP wird dir mit freundlicher Unterstützung deines AStA der Uni Potsdam präsentiert!
-
-## Weiterführende Informationen
-
-* [Wiki](https://github.com/University-of-Potsdam-MM/UP.App/wiki)
-
-## Demo Version
-
-* [Mobile.UP](https://mobileup.uni-potsdam.de/)
-
-## Kontakt
-
-Bei Interesse kontaktieren Sie mobileup-service@uni-potsdam.de
+Die App basiert auf dem Projekt [Mobile.UP](https://github.com/University-of-Potsdam-MM/UP.App) der Universität Potsdam.
 
 ## Lizenz
 
-<a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons Lizenzvertrag" style="border-width:0" src="http://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a><br /><span xmlns:dct="http://purl.org/dc/terms/" property="dct:title">Mobile.UP</span> von <a xmlns:cc="http://creativecommons.org/ns#" href="https://github.com/University-of-Potsdam-MM/UP.App/" property="cc:attributionName" rel="cc:attributionURL">https://github.com/University-of-Potsdam-MM/UP.App/</a> ist lizenziert unter einer <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Namensnennung - Nicht-kommerziell - Weitergabe unter gleichen Bedingungen 4.0 International Lizenz</a>.
+<a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons Lizenzvertrag" style="border-width:0" src="http://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a><br /><span xmlns:dct="http://purl.org/dc/terms/" property="dct:title">Mobile.UP</span> von <a xmlns:cc="http://creativecommons.org/ns#" href="https://github.com/ItsNotYou/Reflect.Competences/" property="cc:attributionName" rel="cc:attributionURL">https://github.com/ItsNotYou/Reflect.Competences/</a> ist lizenziert unter einer <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Namensnennung - Nicht-kommerziell - Weitergabe unter gleichen Bedingungen 4.0 International Lizenz</a>.
