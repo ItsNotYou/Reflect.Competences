@@ -1,0 +1,8 @@
+<ul data-role="listview" data-inset="true" data-theme="b">
+<% competences.each(function(competence, index) { %>
+	<li>
+		<!--<img src="<%= competence.attributes.icon %>">-->
+		<a href="#<%= index %>"><%= competence.attributes.name %></a>
+	</li>
+<% }) %>
+</ul>
