@@ -13,6 +13,23 @@ define([
 
 	var serverUrl = "http://localhost/competence-server/competences";
 
+	var AcquiredCompetences = Backbone.Collection.extend({
+
+		url: function() {
+			var url = new URI(serverUrl + "/json/link/overview");
+			url.segment(this.user);
+			return url.toString();
+		},
+
+		parse: function(response) {
+			var competences = response.mapUserCompetenceLinks;
+			var asEntry = function(key) {
+				return _.extend({name: key}, competences[key][0]);
+			}
+			return _.map(_.keys(competences), asEntry);
+		}
+	});
+
 	var CompetenceModel = Backbone.Model.extend({
 
 		initialize: function(content) {
@@ -88,9 +105,13 @@ define([
 	});
 
 	var competence = new CompetenceModel({name: "Hörverstehen A1"});
-	var evidence = new CompetenceCompletion({course: "university", creator: "Hendrik", role: "student", linkedUser: "Hendrik", competence: competence, evidence: "App-Reflexion,linkZurReflexionsApp", comment: "Stimmt, Herr XY war tatsächlich vor Ort"});
+	var evidence = new CompetenceCompletion({course: "2", creator: "Hendrik", role: "student", linkedUser: "Hendrik", competence: competence, evidence: "App-Reflexion,linkZurReflexionsApp", comment: "Stimmt, Herr XY war tatsächlich vor Ort"});
 	console.log(evidence.url());
 	evidence.save();
+
+	var acquired = new AcquiredCompetences();
+	acquired.user = "Hendrik";
+	acquired.fetch({success: function() { console.log("acquired", acquired.toJSON()); }});
 
 	return {
 		CompetenceCollection: CompetenceCollection
