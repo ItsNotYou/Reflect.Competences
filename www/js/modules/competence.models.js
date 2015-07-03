@@ -27,6 +27,31 @@ define([
 				return _.extend({name: key}, competences[key][0]);
 			}
 			return _.map(_.keys(competences), asEntry);
+		},
+
+		findByCompetence: function(competence) {
+			return this.find(function(model) {
+				return competence.get("name") === model.get("name");
+			});
+		}
+	});
+
+	var CompetenceComment = Backbone.Model.extend({
+
+		url: function() {
+			var url = new URI(serverUrl + "/json/link/comment");
+			url.segment(this.get("linkId"));
+			url.segment(this.get("linkedUser"))
+			url.segment(this.get("course"))
+			url.segment(this.get("role"));
+			url.search({ text: this.get("text") });
+			return url.toString();
+		},
+
+		save: function(attributes, options) {
+			var options = options || {};
+			options.attrs = {};
+			return Backbone.Model.prototype.save.apply(this, [attributes, options]);
 		}
 	});
 
@@ -105,13 +130,22 @@ define([
 	});
 
 	var competence = new CompetenceModel({name: "Hörverstehen A1"});
-	var evidence = new CompetenceCompletion({course: "2", creator: "Hendrik", role: "student", linkedUser: "Hendrik", competence: competence, evidence: "App-Reflexion,linkZurReflexionsApp", comment: "Stimmt, Herr XY war tatsächlich vor Ort"});
+	var evidence = new CompetenceCompletion({course: "2", creator: "Hendrik", role: "student", linkedUser: "Hendrik", competence: competence, evidence: "App-Reflexion,linkZurApp", comment: "Stimmt, Herr XY war tatsächlich vor Ort"});
 	console.log(evidence.url());
 	evidence.save();
 
 	var acquired = new AcquiredCompetences();
 	acquired.user = "Hendrik";
 	acquired.fetch({success: function() { console.log("acquired", acquired.toJSON()); }});
+	acquired.on("sync", function() {
+		var evidenceLink = acquired.findByCompetence(competence);
+		console.log("evidence link id", evidenceLink.get("abstractLinkId"));
+
+		var comment = new CompetenceComment(evidence.attributes);
+		comment.set("linkId", evidenceLink.get("abstractLinkId"));
+		comment.set("text", comment.get("comment"));
+		comment.save();
+	});
 
 	return {
 		CompetenceCollection: CompetenceCollection
