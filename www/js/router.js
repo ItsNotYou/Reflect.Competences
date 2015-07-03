@@ -27,8 +27,9 @@ define([
 	'modules/impressum',
 	'modules/options',
 	'modules/people',
-	'modules/calendar.export'
-], function($, _, Backbone, BaseRouter, Session, utils, customHistory, HomePageView, NewsView, EventsView, CalendarPageView, MoodlePageView, EmergencyPageView, SitemapPageView, RoomPageView, OpeningPageView, TransportPageView, Transport2PageView, MensaPageView, LibraryPageView, LecturesPageView, GradesPageView, ImpressumPageView, OptionsPageView, PeoplePageView, CalendarExportPageView){
+	'modules/calendar.export',
+	'modules/competence.overview'
+], function($, _, Backbone, BaseRouter, Session, utils, customHistory, HomePageView, NewsView, EventsView, CalendarPageView, MoodlePageView, EmergencyPageView, SitemapPageView, RoomPageView, OpeningPageView, TransportPageView, Transport2PageView, MensaPageView, LibraryPageView, LecturesPageView, GradesPageView, ImpressumPageView, OptionsPageView, PeoplePageView, CalendarExportPageView, CompetenceOverview){
 
 	var AppRouter = BaseRouter.extend({
 
@@ -59,7 +60,8 @@ define([
 			"grades":"grades",
 			"impressum": "impressum",
 			"options": "options",
-			"people": "people"
+			"people": "people",
+			"competences": "competences"
 		},
 
 		routesToScrollPositions: {},
@@ -145,6 +147,10 @@ define([
 
 		currentPage: function(){
 			return customHistory.currentRoute();
+		},
+
+		competences: function() {
+			this.changePage(new CompetenceOverview.CompetenceOverviewPageView);
 		},
 
 		news: function(id){
