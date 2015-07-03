@@ -1,12 +1,8 @@
 <?xml version='1.0' encoding='utf-8'?>
 <widget id="de.hgessner.reflectcompetences" version="3.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:gap="http://phonegap.com/ns/1.0">
-    <name>Reflect.CompetencesP</name>
-    <description>
-        Offizielle App der Universität Potsdam
-    </description>
-    <author email="mobileup-service@uni-potsdam.de" href="http://www.elis.uni-potsdam.de/">
-        eLiS-Team
-    </author>
+    <name>Reflect.Competences</name>
+    <description>Kompetenzen reflektieren und kommentieren</description>
+    <author email="hgessner@uni-potsdam.de" href="http://www.elis.uni-potsdam.de/">Hendrik Geßner</author>
     <feature name="http://api.phonegap.com/1.0/device" />
     <preference name="permissions" value="none" />
     <preference name="orientation" value="default" />
