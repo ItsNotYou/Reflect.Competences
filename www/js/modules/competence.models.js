@@ -168,8 +168,18 @@ define([
 				result.context = context;
 				return result;
 			};
+			var nestedCompetences = _.map(competences, parseCompetence, this);
 
-			return _.map(competences, parseCompetence, this);
+			var flattenCompetences = function(parent, competences) {
+				return _.map(competences, function(competence) {
+					competence.parent = parent;
+					var result = flattenCompetences(competence.name, competence.children);
+					competence.children = undefined;
+					result.push(competence);
+					return result;
+				});
+			};
+			return _.flatten(flattenCompetences(undefined, nestedCompetences));
 		},
 
 		_parseTriples: function(response) {
@@ -198,12 +208,7 @@ define([
 		_merge: function(achievements, triples, competences) {
 			return _.map(competences, function(competence) {
 				var result = this._mergeByName(competence, triples);
-				result = this._mergeByName(result, achievements);
-
-				if (competence.children) result.children = this._merge(achievements, triples, competence.children);
-				result.children = new Competences(result.children);
-
-				return result;
+				return this._mergeByName(result, achievements);
 			}, this);
 		},
 

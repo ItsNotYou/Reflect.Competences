@@ -17,9 +17,10 @@ define([
 
 	var CompetenceListView = Backbone.View.extend({
 
-		initialize: function() {
+		initialize: function(options) {
 			this.template = utils.rendertmpl("competence.list");
 
+			this.parent = options.parent;
 			this.listenTo(this.collection, "sync", this.render);
 			this.listenTo(this.collection, "error", this.errorHappened);
 		},
@@ -28,7 +29,9 @@ define([
 		},
 
 		render: function() {
-			this.$el.html(this.template({competences: this.collection}));
+			var competences = this.collection.filter(function(c) { return c.get("parent") == this.parent}, this);
+
+			this.$el.html(this.template({competences: new Backbone.Collection(competences)}));
 			this.$el.trigger("create");
 			return this;
 		}
@@ -71,7 +74,7 @@ define([
 			this.$el.empty();
 			if (model) {
 				this.$el.append(this.template({competence: model}));
-				new CompetenceListView({el: this.$(".subcompetences"), collection: model.get("children")}).render();
+				new CompetenceListView({el: this.$(".subcompetences"), collection: this.collection, parent: model.get("name")}).render();
 			} else {
 				this.$el.append("<div>Wir warten noch auf Daten</div>");
 			}
