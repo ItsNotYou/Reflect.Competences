@@ -12,87 +12,118 @@ define([
 ], function($, _, Backbone, utils, moment, Session, _str, URI){
 
 	var serverUrl = "http://localhost/competence-server/competences";
+	var evidence = {
+		link: "https://github.com/ItsNotYou/Reflect.Competences",
+		name: "Reflect.Competences"
+	};
 
-	var AcquiredCompetences = Backbone.Collection.extend({
+	var Context = Backbone.Model.extend({
 
-		url: function() {
-			var url = new URI(serverUrl + "/json/link/overview");
-			url.segment(this.user);
-			return url.toString();
-		},
-
-		parse: function(response) {
-			var competences = response.mapUserCompetenceLinks;
-			var asEntry = function(key) {
-				return _.extend({name: key}, competences[key][0]);
+		initialize: function(attrs) {
+			if (!attrs.course) {
+				this.set("course", "university");
 			}
-			return _.map(_.keys(competences), asEntry);
-		},
 
-		findByCompetence: function(competence) {
-			return this.find(function(model) {
-				return competence.get("name") === model.get("name");
-			});
+			var competences = new Competences();
+			competences.context = this;
+			this.set("competences", competences);
 		}
 	});
 
-	var CompetenceComment = Backbone.Model.extend({
+	var Competence = Backbone.Model.extend({
 
-		url: function() {
-			var url = new URI(serverUrl + "/json/link/comment");
-			url.segment(this.get("linkId"));
-			url.segment(this.get("linkedUser"))
-			url.segment(this.get("course"))
-			url.segment(this.get("role"));
-			url.search({ text: this.get("text") });
-			return url.toString();
-		},
-
-		save: function(attributes, options) {
-			var options = options || {};
-			options.attrs = {};
-			return Backbone.Model.prototype.save.apply(this, [attributes, options]);
-		}
-	});
-
-	var CompetenceModel = Backbone.Model.extend({
-
-		initialize: function(content) {
-			this.set("children", new CompetenceCollection(content.children));
-		}
-	});
-
-	var CompetenceCompletion = Backbone.Model.extend({
-
-		initialize: function() {
-		},
-
-		url: function() {
+		_competenceCompletionUrl: function() {
 			var url = new URI(serverUrl + "/json/link/create");
-			url.segment(this.get("course"))
-				.segment(this.get("creator"))
-				.segment(this.get("role"))
-				.segment(this.get("linkedUser"));
+			url.segment(this.get("context").get("course"))
+				.segment(this.get("context").get("username"))
+				.segment("student")
+				.segment(this.get("context").get("username"));
 			url.search({
-				competences: this.get("competence").get("name"),
-				evidences: this.get("evidence")
+				competences: this.get("name"),
+				evidences: evidence.link + "," + evidence.name
 			});
 			return url.toString();
 		},
 
-		save: function(attributes, options) {
+		_fetchCompetenceLink: function(competenceName, success, error) {
+			var responseSuccess = function(response) {
+				var evidences = response.mapUserCompetenceLinks[competenceName];
+				var ev = _.find(evidences, function(ev) {
+					return ev.evidenceTitel === evidence.link && ev.evidenceUrl === evidence.name;
+				});
+
+				if (ev) success(ev.abstractLinkId);
+				else error();
+			};
+
+			$.ajax({
+				url: new URI(serverUrl + "/json/link/overview").segment(this.get("context").get("username")).toString(),
+				type: "GET",
+				success: responseSuccess,
+				error: error
+			});
+		},
+
+		_commentSubmitUrl: function(abstractLinkId) {
+			var url = new URI(serverUrl + "/json/link/comment");
+			url.segment(abstractLinkId);
+			url.segment(this.get("context").get("username"))
+			url.segment(this.get("context").get("course"))
+			url.segment("student");
+			url.search({ text: this.get("comment") });
+			return url.toString();
+		},
+
+		_wrapError: function(options) {
+			var model = this;
+		    var error = options.error;
+		    return function(resp) {
+				if (error) error(model, resp, options);
+				model.trigger('error', model, resp, options);
+			};
+		},
+
+		save: function(options) {
 			var options = options || {};
-			options.attrs = {};
-			return Backbone.Model.prototype.save.apply(this, [attributes, options]);
+
+			var saveComment = _.bind(function() {
+				var saveCommentByLink = _.bind(function(abstractLinkId) {
+					$.ajax({
+						url: this._commentSubmitUrl(abstractLinkId),
+						type: "POST",
+						dataType: "text",
+						success: _.bind(function() {
+							if (options.success) options.success(this);
+							this.trigger("sync");
+						}, this),
+						error: this._wrapError(options)
+					});
+				}, this);
+
+				if (this.get("comment")) {
+					this._fetchCompetenceLink(this.get("name"), saveCommentByLink, this._wrapError(options));
+				}
+			}, this);
+
+			$.ajax({
+				url: this._competenceCompletionUrl(),
+				type: "POST",
+				dataType: "text",
+				success: saveComment,
+				error: this._wrapError(options)
+			});
+
+			this.trigger("request");
+			return undefined;
 		}
 	});
 
-	var CompetenceCollection = Backbone.Collection.extend({
-		model: CompetenceModel,
+	var Competences = Backbone.Collection.extend({
+		model: Competence,
 
 		url: function() {
 			var url = new URI(serverUrl + "/xml/competencetree");
-			url.segment("university")
+			url.segment(this.context.get("course"))
 				.segment("all")
 				.segment("nocache");
 			return url.toString();
@@ -116,10 +147,12 @@ define([
 					}
 				}
 
+				result.context = this.context;
+				result.children = new Competences(result.children);
 				return result;
 			};
 
-			return _.map(competences, parseCompetence);
+			return _.map(competences, parseCompetence, this);
 		},
 
 		fetch: function(options) {
@@ -129,25 +162,14 @@ define([
 		}
 	});
 
-	var competence = new CompetenceModel({name: "Hörverstehen A1"});
-	var evidence = new CompetenceCompletion({course: "2", creator: "Hendrik", role: "student", linkedUser: "Hendrik", competence: competence, evidence: "App-Reflexion,linkZurApp", comment: "Stimmt, Herr XY war tatsächlich vor Ort"});
-	console.log(evidence.url());
-	evidence.save();
-
-	var acquired = new AcquiredCompetences();
-	acquired.user = "Hendrik";
-	acquired.fetch({success: function() { console.log("acquired", acquired.toJSON()); }});
-	acquired.on("sync", function() {
-		var evidenceLink = acquired.findByCompetence(competence);
-		console.log("evidence link id", evidenceLink.get("abstractLinkId"));
-
-		var comment = new CompetenceComment(evidence.attributes);
-		comment.set("linkId", evidenceLink.get("abstractLinkId"));
-		comment.set("text", comment.get("comment"));
-		comment.save();
-	});
+	/*var context = new Context({course: "2", username: "Franz"});
+	var competence = new Competence({context: context, name: "Hörverstehen A2", comment: "Franz war hier"});
+	competence.save({
+		success: function() { console.log("success"); },
+		error: function() { console.log("error"); }
+	});*/
 
 	return {
-		CompetenceCollection: CompetenceCollection
+		Context: Context
 	};
 });

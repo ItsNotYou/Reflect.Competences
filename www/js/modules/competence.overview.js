@@ -11,26 +11,17 @@ define([
 	'hammerjs'
 ], function($, _, Backbone, utils, moment, Session, _str, Models){
 
+	var context = new Models.Context({username: "Franz"});
+	var collection = context.get("competences");
+	collection.fetch();
+
 	var CompetenceListView = Backbone.View.extend({
 
-		events: {
-			"click a": "open"
-		},
-
 		initialize: function() {
-			this.template = utils.rendertmpl('competence.list');
+			this.template = utils.rendertmpl("competence.list");
 
 			this.listenTo(this.collection, "sync", this.render);
 			this.listenTo(this.collection, "error", this.errorHappened);
-		},
-
-		open: function(event) {
-			event.preventDefault();
-
-			var id = $(event.currentTarget).attr("href").slice(1);
-			var model = this.collection.at(parseInt(id));
-
-			new CompetenceListView({el: this.$el, collection: model.get("children")}).render();
 		},
 
 		errorHappened: function(a, b, c, d, e) {
@@ -43,21 +34,70 @@ define([
 		}
 	});
 
+	var CompetenceView = Backbone.View.extend({
+
+		events: {
+			"submit": "submitCompetence"
+		},
+
+		initialize: function(options) {
+			this.template = utils.rendertmpl("competence.item");
+			this.page = options.page;
+
+			this.listenTo(this.collection, "sync", _.bind(this.render, this));
+		},
+
+		submitCompetence: function(ev) {
+			ev.preventDefault();
+
+			var comment = this.$("#comment").val();
+			var model = this.collection.find(function(competence) { return competence.get("name") === this.page}, this);
+
+			model.set("comment", comment);
+			model.save({
+				success: function() {
+					alert("Success");
+					debugger;
+				},
+				error: function() {
+					alert("Error");
+					debugger;
+				}
+			});
+		},
+
+		render: function() {
+			var model = this.collection.find(function(competence) { return competence.get("name") === this.page}, this);
+			this.$el.empty();
+			if (model) {
+				this.$el.append(this.template({competence: model}));
+			} else {
+				this.$el.append("<div>Wir warten noch auf Daten</div>");
+			}
+
+			this.$el.trigger("create");
+			return this;
+		}
+	});
+
 	var CompetenceOverviewPageView = Backbone.View.extend({
 
 		attributes: {"id": "competenceOverview"},
 
-		initialize: function() {
-			this.template = utils.rendertmpl('competence.overview');
+		initialize: function(options) {
+			this.template = utils.rendertmpl("competence.overview");
+			this.page = options.page;
 		},
 
 		render: function() {
 			this.$el.html(this.template({}));
 			this.$el.trigger("create");
 
-			var collection = new Models.CompetenceCollection();
-			new CompetenceListView({el: this.$("#competenceList"), collection: collection});
-			collection.fetch();
+			if (this.page) {
+				new CompetenceView({el: this.$("#competenceList"), collection: collection, page: this.page}).render();
+			} else {
+				new CompetenceListView({el: this.$("#competenceList"), collection: collection}).render();
+			}
 
 			return this;
 		}
