@@ -58,14 +58,8 @@ define([
 
 			model.set("comment", comment);
 			model.save({
-				success: function() {
-					alert("Success");
-					debugger;
-				},
-				error: function() {
-					alert("Error");
-					debugger;
-				}
+				success: function() { alert("Success"); },
+				error: function() { alert("Error"); }
 			});
 		},
 
