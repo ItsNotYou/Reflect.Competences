@@ -32,6 +32,11 @@ define([
 
 	var Competence = Backbone.Model.extend({
 
+		isCompletable: function() {
+			var pre = this.get("prerequisites");
+			return pre ? _.all(pre, function(p) { return p.get("isCompleted"); }) : true;
+		},
+
 		_competenceCompletionUrl: function() {
 			var url = new URI(serverUrl + "/json/link/create");
 			url.segment(this.get("context").get("course"))
