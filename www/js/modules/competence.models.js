@@ -33,8 +33,12 @@ define([
 	var Competence = Backbone.Model.extend({
 
 		isCompletable: function() {
-			var pre = this.get("prerequisites");
-			return pre ? _.all(pre, function(p) { return p.get("isCompleted"); }) : true;
+			var pres = this.get("prerequisites");
+			var preTest = function(p) {
+				var pre = this.collection.find(function(b) { b.get("name") == p; });
+				return pre ? pre.get("isCompleted") : false;
+			};
+			return pres ? _.all(pres, preTest, this) : true;
 		},
 
 		_competenceCompletionUrl: function() {
