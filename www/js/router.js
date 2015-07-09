@@ -61,7 +61,8 @@ define([
 			"impressum": "impressum",
 			"options": "options",
 			"people": "people",
-			"competences": "competences"
+			"competences": "competences",
+			"competences/:competenceName": "competences"
 		},
 
 		routesToScrollPositions: {},
@@ -149,8 +150,8 @@ define([
 			return customHistory.currentRoute();
 		},
 
-		competences: function() {
-			this.changePage(new CompetenceOverview.CompetenceOverviewPageView);
+		competences: function(competenceName) {
+			this.changePage(new CompetenceOverview.CompetenceOverviewPageView({page: competenceName}));
 		},
 
 		news: function(id){

@@ -2,7 +2,7 @@
 <% competences.each(function(competence, index) { %>
 	<li>
 		<!--<img src="<%= competence.attributes.icon %>">-->
-		<a href="#<%= index %>"><%= competence.attributes.name %></a>
+		<a href="#competences/<% print(encodeURIComponent(competence.attributes.name)); %>"><%= competence.attributes.name %></a>
 	</li>
 <% }) %>
 </ul>
