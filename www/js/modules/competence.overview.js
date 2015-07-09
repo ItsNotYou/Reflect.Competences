@@ -71,11 +71,12 @@ define([
 			this.$el.empty();
 			if (model) {
 				this.$el.append(this.template({competence: model}));
+				new CompetenceListView({el: this.$(".subcompetences"), collection: model.get("children")}).render();
 			} else {
 				this.$el.append("<div>Wir warten noch auf Daten</div>");
 			}
-
 			this.$el.trigger("create");
+
 			return this;
 		}
 	});
