@@ -121,7 +121,13 @@ define([
 	var Competences = Backbone.Collection.extend({
 		model: Competence,
 
-		url: function() {
+		_triplesUrl: function() {
+			var url = new URI(serverUrl + "/json/prerequisite/graph");
+			url.segment(this.context.get("course"))
+			return url.toString();
+		},
+
+		_competencesUrl: function() {
 			var url = new URI(serverUrl + "/xml/competencetree");
 			url.segment(this.context.get("course"))
 				.segment("all")
@@ -129,9 +135,16 @@ define([
 			return url.toString();
 		},
 
-		parse: function(response) {
+		_achievementsUrl: function() {
+			var url = new URI(serverUrl + "/json/link/overview");
+			url.segment(this.context.get("username"));
+			return url.toString();
+		},
+
+		_parseCompetences: function(response) {
 			var competences = response.childNodes[0].childNodes[0].childNodes;
 
+			var context = this.context;
 			var parseCompetence = function(competence) {
 				var result = {};
 				result.name = competence.getAttribute("name");
@@ -147,18 +160,103 @@ define([
 					}
 				}
 
-				result.context = this.context;
-				result.children = new Competences(result.children);
+				result.context = context;
 				return result;
 			};
 
 			return _.map(competences, parseCompetence, this);
 		},
 
+		_parseTriples: function(response) {
+			var triples = response.triples;
+			var prerequisites = _.groupBy(triples, "toNode");
+			return _.map(_.pairs(prerequisites), function(prerequisite) {
+				return {
+					name: prerequisite[0],
+					prerequisites: _.pluck(prerequisite[1], "fromNode")
+				};
+			}, this);
+		},
+
+		_parseAchievements: function(response) {
+			var achievements = response.mapUserCompetenceLinks;
+			return _.map(_.keys(achievements), function(name) {
+				return {name: name, isCompleted: true};
+			});
+		},
+
+		_mergeByName: function(base, collection) {
+			var equivalent = _.find(collection, function(item) { return item.name == base.name});
+			return equivalent ? _.defaults(base, equivalent) : base;
+		},
+
+		_merge: function(achievements, triples, competences) {
+			return _.map(competences, function(competence) {
+				var result = this._mergeByName(competence, triples);
+				result = this._mergeByName(result, achievements);
+
+				if (competence.children) result.children = this._merge(achievements, triples, competence.children);
+				result.children = new Competences(result.children);
+
+				return result;
+			}, this);
+		},
+
 		fetch: function(options) {
 			var options = options || {};
-			options.dataType = "xml";
-			return Backbone.Collection.prototype.fetch.apply(this, [options]);
+
+			// Wait for all three requests to finish before merging the results
+			var syncGuard = _.after(3, _.bind(function() {
+				// If a response is missing: go rampage
+				var allResponses = result.achievements && result.triples && result.competences;
+				if (!allResponses) {
+					if (options.error) options.error(this, undefined, options);
+					this.trigger('error', this, undefined, options);
+					return;
+				}
+
+				// Otherwise: parse, merge and set
+				var achievements = this._parseAchievements(result.achievements);
+				var triples = this._parseTriples(result.triples);
+				var competences = this._parseCompetences(result.competences);
+				this.set(this._merge(achievements, triples, competences));
+
+				if (options.success) options.success(this, undefined, options);
+				this.trigger('sync', this, undefined, options);
+			}, this));
+
+			var result = {};
+			var setResult = function(property) {
+				return function(response) {
+					result[property] = response;
+					syncGuard();
+				};
+			};
+
+			$.ajax({
+				url: this._achievementsUrl(),
+				type: "GET",
+				success: setResult("achievements"),
+				error: syncGuard
+			});
+
+			$.ajax({
+				url: this._triplesUrl(),
+				type: "GET",
+				success: setResult("triples"),
+				error: syncGuard
+			});
+
+			$.ajax({
+				url: this._competencesUrl(),
+				type: "GET",
+				dataType: "xml",
+				success: setResult("competences"),
+				error: syncGuard
+			});
+
+			this.trigger("request");
+			return undefined;
 		}
 	});
 
