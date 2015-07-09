@@ -95,6 +95,12 @@ define([
 			this.$el.trigger("create");
 
 			if (this.page) {
+				var headerLink = this.$(".menubutton");
+				headerLink.addClass("back");
+				headerLink.removeClass("menubutton");
+				headerLink.attr("href", "#competences");
+				headerLink.attr("data-direction", "reverse");
+
 				new CompetenceView({el: this.$("#competenceList"), collection: collection, page: this.page}).render();
 			} else {
 				new CompetenceListView({el: this.$("#competenceList"), collection: collection}).render();
