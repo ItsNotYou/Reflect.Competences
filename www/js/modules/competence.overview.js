@@ -57,8 +57,8 @@ define([
 
 			model.set("comment", comment);
 			model.save({
-				success: _.bind(function() { this.collection.fetch(); alert("Success"); }, this),
-				error: function() { alert("Error"); }
+				success: _.bind(function() { this.collection.fetch(); }, this),
+				error: function() { alert("Es ist ein Fehler aufgetreten."); }
 			});
 		},
 
