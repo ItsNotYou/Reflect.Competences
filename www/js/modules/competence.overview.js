@@ -11,10 +11,6 @@ define([
 	'hammerjs'
 ], function($, _, Backbone, utils, moment, Session, _str, Models){
 
-	var context = new Models.Context({username: "Franz"});
-	var collection = context.get("competences");
-	collection.fetch();
-
 	var CompetenceListView = Backbone.View.extend({
 
 		initialize: function(options) {
@@ -88,6 +84,16 @@ define([
 		initialize: function(options) {
 			this.template = utils.rendertmpl("competence.overview");
 			this.page = options.page;
+
+			this.collection = this._createCollection();
+			this.collection.fetch();
+		},
+
+		_createCollection: function() {
+			var session = new Session();
+			var username = session.get('up.session.username');
+			var context = new Models.Context({username: username});
+			return context.get("competences");
 		},
 
 		render: function() {
@@ -101,9 +107,9 @@ define([
 				headerLink.attr("href", "#competences");
 				headerLink.attr("data-direction", "reverse");
 
-				new CompetenceView({el: this.$("#competenceList"), collection: collection, page: this.page}).render();
+				new CompetenceView({el: this.$("#competenceList"), collection: this.collection, page: this.page}).render();
 			} else {
-				new CompetenceListView({el: this.$("#competenceList"), collection: collection}).render();
+				new CompetenceListView({el: this.$("#competenceList"), collection: this.collection}).render();
 			}
 
 			return this;
