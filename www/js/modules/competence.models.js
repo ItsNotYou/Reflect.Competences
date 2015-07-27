@@ -18,6 +18,7 @@ define([
 	};
 
 	var Context = Backbone.Model.extend({
+		idAttribute: "name",
 
 		initialize: function(attrs) {
 			if (!attrs.course) {

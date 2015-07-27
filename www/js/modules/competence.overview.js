@@ -47,7 +47,10 @@ define([
 			this.template = utils.rendertmpl("competence.item");
 			this.page = options.page;
 
-			this.listenTo(this.collection, "sync", _.bind(this.render, this));
+			_.bindAll(this, "render");
+
+			this.listenTo(this.collection, "request", this.render);
+			this.listenTo(this.collection, "sync", this.render);
 		},
 
 		submitCompetence: function(ev) {
@@ -58,7 +61,7 @@ define([
 
 			model.set("comment", comment);
 			model.save({
-				success: function() { alert("Success"); },
+				success: _.bind(function() { this.collection.fetch(); alert("Success"); }, this),
 				error: function() { alert("Error"); }
 			});
 		},
